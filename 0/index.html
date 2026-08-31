@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Project 0 | CS180</title>
+
+    <link rel="stylesheet" href="../style.css">
+
+    <style>
+        @import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Manrope:wght@400;500;700&display=swap");
+
+        :root {
+            --page-bg-1: #f4f9ff;
+            --page-bg-2: #eef3f8;
+            --panel-bg: rgba(255, 255, 255, 0.88);
+            --card-shadow: 0 20px 48px rgba(15, 23, 42, 0.1);
+            --text: #1c2433;
+            --muted: #59657d;
+            --border: rgba(133, 156, 192, 0.25);
+            --accent: #1157a7;
+            --accent-2: #0e447f;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Manrope", "Segoe UI", Tahoma, sans-serif;
+            background:
+                radial-gradient(circle at 12% 0%, rgba(127, 197, 255, 0.28) 0%, rgba(127, 197, 255, 0) 48%),
+                linear-gradient(180deg, var(--page-bg-1) 0%, var(--page-bg-2) 100%);
+            color: var(--text);
+            line-height: 1.7;
+        }
+
+        .project-page {
+            width: min(100%, 1100px);
+            margin: 0 auto;
+            padding: clamp(24px, 5vw, 56px) clamp(16px, 3vw, 32px) 96px;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 22px;
+            padding: 10px 16px;
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+            box-shadow: 0 10px 26px rgba(17, 87, 167, 0.25);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .back-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 14px 32px rgba(17, 87, 167, 0.3);
+        }
+
+        .project-title {
+            margin-bottom: clamp(2.2rem, 5vw, 4.2rem);
+            text-align: center;
+        }
+
+        .project-title h1 {
+            margin: 0 0 10px;
+            font-family: "Fraunces", Georgia, serif;
+            font-size: clamp(2.1rem, 4vw, 3.3rem);
+            line-height: 1.15;
+            letter-spacing: -0.04em;
+        }
+
+        .project-title p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 1rem;
+        }
+
+        .part {
+            margin-bottom: clamp(3rem, 6vw, 6rem);
+            padding: clamp(18px, 3vw, 30px);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            background: var(--panel-bg);
+            box-shadow: var(--card-shadow);
+        }
+
+        .part h2 {
+            margin: 0 0 1rem;
+            font-family: "Fraunces", Georgia, serif;
+            font-size: clamp(1.5rem, 2.6vw, 2.2rem);
+            line-height: 1.25;
+            letter-spacing: -0.03em;
+            text-align: center;
+        }
+
+        .image-pair {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: clamp(12px, 2vw, 24px);
+            margin: 24px 0 18px;
+        }
+
+        figure {
+            margin: 0;
+            border-radius: 16px;
+            overflow: hidden;
+            background: var(--panel-bg);
+            border: 1px solid var(--border);
+            box-shadow: var(--card-shadow);
+        }
+
+        .image-pair img,
+        .single-image img {
+            display: block;
+            width: 100%;
+            max-width: 100%;
+            height: auto;
+            border-radius: inherit;
+            object-fit: contain;
+            background: rgba(133, 156, 192, 0.08);
+        }
+
+        .image-pair img {
+            max-height: min(58vh, 460px);
+        }
+
+        .single-image img {
+            max-height: min(72vh, 620px);
+        }
+
+        figcaption {
+            margin: 10px 10px 12px;
+            color: var(--muted);
+            text-align: center;
+            font-size: 0.95rem;
+        }
+
+        .single-image {
+            width: min(100%, 760px);
+            margin: 24px auto 18px;
+        }
+
+        p {
+            max-width: 74ch;
+            margin: 0.85rem auto 0;
+            color: var(--text);
+            text-wrap: pretty;
+            text-align: justify;
+            text-justify: inter-word;
+            hyphens: auto;
+        }
+
+        @media (max-width: 700px) {
+            .project-page {
+                padding: 20px 14px 72px;
+            }
+
+            .image-pair {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            .single-image {
+                width: 100%;
+            }
+
+            .part {
+                margin-bottom: 3.2rem;
+                border-radius: 16px;
+                padding: 16px;
+            }
+
+            .image-pair img {
+                max-height: 380px;
+            }
+
+            .single-image img {
+                max-height: 480px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="project-page">
+
+    <a class="back-link" href="../index.html">
+        ← Back to Portfolio
+    </a>
+
+    <section class="project-title">
+        <h1>Project 0: Becoming Friends with Your Camera</h1>
+        <p>
+            CS180: Introduction to Computer Vision and Computational Photography
+        </p>
+    </section>
+
+
+    <!-- PART 1 -->
+    <section class="part">
+
+        <h2>Part 1: Selfie — The Wrong Way vs. The Right Way</h2>
+
+        <div class="image-pair">
+
+            <figure>
+                <img
+                    src="./media/1a.jpg"
+                    alt="Close-up portrait">
+
+                <figcaption>
+                    Close-up portrait - camera positioned near the subject
+                </figcaption>
+            </figure>
+
+
+            <figure>
+                <img
+                    src="./media/1b.jpg"
+                    alt="Portrait taken farther away with zoom">
+
+                <figcaption>
+                    Portrait from farther away - zoomed in to match framing
+                </figcaption>
+            </figure>
+
+        </div>
+
+        <p>
+            In this project, I explored how camera position and focal length alter the way a subject appears. For the portrait comparison, I took one photo very close to the face and another from farther away while zooming in to keep the face about the same size in the frame.
+        </p>
+        <p>
+            The close-up portrait looks distorted because the nose and center of the face are much closer to the camera than the ears and sides of the head. That difference in distance creates exaggerated perspective, making the facial features appear disproportionately large. By stepping back and zooming in, the relative depth differences become much smaller compared to the overall camera-to-subject distance, so the face looks more natural and less stretched.
+        </p>
+        <p>
+            This shows that moving the camera changes the perspective, while zooming mainly changes the framing and field of view. The subject can remain the same size in the image without necessarily preserving the same visual distortion.
+        </p>
+
+    </section>
+
+
+    <!-- PART 2 -->
+    <section class="part">
+
+        <h2>Part 2: Architectural Perspective Compression</h2>
+
+        <div class="image-pair">
+
+            <figure>
+                <img
+                    src="./media/2b.jpg"
+                    alt="Building photographed from far away with zoom">
+
+                <figcaption>
+                    Farther viewpoint with zoom - compressed perspective
+                </figcaption>
+            </figure>
+
+
+            <figure>
+                <img
+                    src="./media/2a.jpg"
+                    alt="Building photographed from closer with a wider view">
+
+                <figcaption>
+                    Closer viewpoint without zoom - stronger perspective depth
+                </figcaption>
+            </figure>
+
+        </div>
+
+        <p>
+            This experiment demonstrates the same idea on a larger scale: changing the camera’s position affects how depth is perceived in the whole scene. In the first photo, I stood farther away and zoomed in so the building filled a similar portion of the frame. The result appears flatter and more compressed because the depth differences across the building are smaller relative to the total camera distance.
+        </p>
+        <p>
+            In the second photo, I moved closer without zooming and kept the building approximately the same apparent size. The nearby parts of the facade appear much larger relative to farther parts, and the architectural lines convey a stronger sense of depth. This makes the structure feel more three-dimensional.
+        </p>
+        <p>
+            In other words, the perspective changes because the camera was physically moved, not simply because the focal length changed. Zoom can help match the framing, but it does not fundamentally change the spatial relationship between objects in the scene.
+        </p>
+
+    </section>
+
+
+    <!-- PART 3 -->
+    <section class="part">
+
+        <h2>Part 3: The Dolly Zoom</h2>
+
+        <div class="single-image">
+
+            <figure>
+                <img
+                    src="./media/3.gif"
+                    alt="Animated dolly zoom">
+
+                <figcaption>
+                    Dolly zoom - moving backward while zooming in
+                </figcaption>
+            </figure>
+
+        </div>
+
+        <p>
+            For the dolly zoom, I took a sequence of photographs while moving the camera backward and zooming in at the same time. I tried to keep the main subject approximately the same size in each frame so that the background would change around it.
+        </p>
+        <p>
+            When these frames are combined into the GIF, the subject stays relatively stable while the background appears to stretch, compress, or shift in scale. This is the classic "Vertigo" effect: moving the camera changes perspective, while the zoom compensates to keep the subject framed similarly.
+        </p>
+        <p>
+            The result is a visually striking illusion where the subject remains centered but the world around it feels like it is changing depth and scale. It is a powerful example of how perspective and focal length work together to shape our perception of a scene.
+        </p>
+
+    </section>
+
+</div>
+
+</body>
+</html>
