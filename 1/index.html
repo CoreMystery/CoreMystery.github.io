@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project 1 | CS180</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    { left: "$$", right: "$$", display: true },
+                    { left: "$", right: "$", display: false }
+                ]
+            });
+
+            document.querySelectorAll("img").forEach(function (img, index) {
+                if (index > 0) {
+                    img.loading = "lazy";
+                }
+            });
+        });
+    </script>
+
+    <style>
+        @import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Manrope:wght@400;500;700&display=swap");
+
+        :root {
+            --page-bg-1: #f4f9ff;
+            --page-bg-2: #eef3f8;
+            --panel-bg: rgba(255, 255, 255, 0.9);
+            --card-shadow: 0 20px 48px rgba(15, 23, 42, 0.1);
+            --text: #1c2433;
+            --muted: #59657d;
+            --border: rgba(133, 156, 192, 0.25);
+            --accent: #1157a7;
+            --accent-2: #0e447f;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Manrope", "Segoe UI", Tahoma, sans-serif;
+            background:
+                radial-gradient(circle at 12% 0%, rgba(127, 197, 255, 0.28) 0%, rgba(127, 197, 255, 0) 48%),
+                linear-gradient(180deg, var(--page-bg-1) 0%, var(--page-bg-2) 100%);
+            color: var(--text);
+            line-height: 1.78;
+        }
+
+        .project-page {
+            width: min(100%, 1120px);
+            margin: 0 auto;
+            padding: clamp(24px, 5vw, 56px) clamp(16px, 3vw, 32px) 96px;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 20px;
+            padding: 10px 16px;
+            color: #fff;
+            text-decoration: none;
+            font-weight: 700;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+            box-shadow: 0 10px 26px rgba(17, 87, 167, 0.25);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .back-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 14px 32px rgba(17, 87, 167, 0.3);
+        }
+
+        .project-title {
+            text-align: center;
+            margin-bottom: clamp(2.1rem, 5vw, 4rem);
+        }
+
+        .project-title h1 {
+            margin: 0 0 8px;
+            font-family: "Fraunces", Georgia, serif;
+            font-size: clamp(2.1rem, 4vw, 3.4rem);
+            line-height: 1.12;
+            letter-spacing: -0.04em;
+        }
+
+        .project-title p {
+            margin: 0.25rem auto 0;
+            max-width: 74ch;
+            color: var(--muted);
+            text-align: center;
+        }
+
+        .part {
+            margin-bottom: clamp(2.5rem, 6vw, 5rem);
+            padding: clamp(18px, 3vw, 30px);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            background: var(--panel-bg);
+            box-shadow: var(--card-shadow);
+        }
+
+        .part h2 {
+            margin: 0 0 1rem;
+            font-family: "Fraunces", Georgia, serif;
+            font-size: clamp(1.45rem, 2.6vw, 2.2rem);
+            letter-spacing: -0.03em;
+            text-align: center;
+        }
+
+        .part h3 {
+            margin: 1.2rem 0 0.4rem;
+            font-size: 1.1rem;
+            color: #233551;
+        }
+
+        p {
+            max-width: 76ch;
+            margin: 0.7rem auto 0;
+            text-align: left;
+            hyphens: none;
+            overflow-wrap: normal;
+        }
+
+        .note {
+            margin: 1rem auto 0;
+            max-width: 76ch;
+            padding: 12px 14px;
+            border-left: 4px solid var(--accent);
+            background: rgba(17, 87, 167, 0.08);
+            border-radius: 8px;
+        }
+
+        .formula-block {
+            margin: 1rem auto;
+            max-width: 76ch;
+            padding: 12px 14px;
+            border: 1px dashed var(--border);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.65);
+            font-size: 0.95rem;
+            white-space: pre-wrap;
+        }
+
+        .formula-block .katex-display {
+            margin: 0.6rem 0;
+        }
+
+        .single-image {
+            width: min(100%, 880px);
+            margin: 20px auto 10px;
+        }
+
+        .image-pair,
+        .gallery {
+            display: grid;
+            gap: 16px;
+            margin: 20px 0 10px;
+        }
+
+        .image-pair {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .gallery {
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        }
+
+        figure {
+            margin: 0;
+            border-radius: 14px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 14px 34px rgba(15, 23, 42, 0.1);
+        }
+
+        img {
+            display: block;
+            width: 100%;
+            height: auto;
+            object-fit: contain;
+            background: rgba(133, 156, 192, 0.08);
+        }
+
+        .gallery img {
+            max-height: 300px;
+        }
+
+        .image-pair img {
+            max-height: 400px;
+        }
+
+        .single-image img {
+            max-height: 520px;
+        }
+
+        figcaption {
+            margin: 10px;
+            color: var(--muted);
+            font-size: 0.95rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            font-size: 0.95rem;
+        }
+
+        th,
+        td {
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+            padding: 10px 8px;
+            vertical-align: top;
+        }
+
+        th {
+            font-weight: 700;
+            color: #233551;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+        }
+
+        .list-tight {
+            margin: 0.8rem auto 0;
+            max-width: 76ch;
+            padding-left: 1.2rem;
+        }
+
+        .list-tight li {
+            margin-bottom: 0.35rem;
+        }
+
+        @media (max-width: 780px) {
+            .project-page {
+                padding: 20px 14px 72px;
+            }
+
+            .part {
+                padding: 16px;
+                border-radius: 16px;
+            }
+
+            .image-pair {
+                grid-template-columns: 1fr;
+            }
+
+            .gallery img {
+                max-height: 260px;
+            }
+
+            .image-pair img {
+                max-height: 360px;
+            }
+
+            .single-image img {
+                max-height: 430px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="project-page">
+        <a class="back-link" href="../index.html">&larr; Back to Portfolio</a>
+
+        <section class="project-title">
+            <h1>Project 1: Images of the Russian Empire</h1>
+            <p>Colorizing the Prokudin-Gorskii Photo Collection</p>
+            <p>
+                This project reconstructs color photographs from glass-plate scans by aligning the green and red exposures to the blue reference channel. I implemented single-scale exhaustive search for low-resolution JPEGs and a coarse-to-fine image pyramid for full-resolution TIFF scans. I evaluated L2 and NCC for single-scale alignment and used raw-pixel NCC as the baseline metric for the final pyramid pipeline. As an optional Bells & Whistles extension, I used Sobel edge features to correct the difficult Emir image.
+            </p>
+        </section>
+
+        <section class="part">
+            <h2>Overview and Channel Splitting</h2>
+            <p>
+                Sergei Prokudin-Gorskii captured each scene through blue, green, and red filters. In each scanned plate, the channels are stacked vertically: blue at the top, green in the middle, and red at the bottom. I split the image into three equal-height bands, keep blue fixed as reference, and search for x and y translations that align green and red to blue.
+            </p>
+            <p>
+                JPEG inputs are 8-bit while full-resolution TIFF scans can be 16-bit, so I convert all channels to floating-point values on a common [0, 1] scale before alignment.
+            </p>
+            <div class="single-image">
+                <figure>
+                    <img src="./images/cathedral_raw.jpg" alt="Raw stacked glass plate">
+                    <figcaption>Example stacked plate: top is blue, middle is green, bottom is red.</figcaption>
+                </figure>
+            </div>
+            <div class="formula-block">Top -> Blue
+Middle -> Green
+Bottom -> Red</div>
+        </section>
+
+        <section class="part">
+            <h2>Single-Scale Alignment on JPEGs</h2>
+            <p>
+                For low-resolution JPEG inputs, I use exhaustive search over displacements in [-15, 15] for both axes. I evaluated both L2 distance and NCC while scoring only an interior crop to reduce border artifacts.
+            </p>
+            <div class="formula-block">$$
+L_2(I_1, I_2) = \sqrt{\sum_p (I_1(p) - I_2(p))^2}
+$$
+
+$$
+\operatorname{NCC}(I_1, I_2) =
+\frac{(I_1 - \bar{I}_1) \cdot (I_2 - \bar{I}_2)}{\lVert I_1 - \bar{I}_1 \rVert_2\,\lVert I_2 - \bar{I}_2 \rVert_2}
+$$</div>
+            <p>
+                Smaller $L_2$ is better; larger NCC is better.
+            </p>
+            <p>
+                Offset convention for all tables on this page is (x, y), where positive x shifts right and positive y shifts down.
+            </p>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Image</th>
+                            <th>Metric</th>
+                            <th>Green Offset (x, y)</th>
+                            <th>Red Offset (x, y)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Cathedral</td><td>L2</td><td>(2, 5)</td><td>(3, 12)</td></tr>
+                        <tr><td>Cathedral</td><td>NCC</td><td>(2, 5)</td><td>(3, 12)</td></tr>
+                        <tr><td>Monastery</td><td>L2</td><td>(2, -3)</td><td>(2, 3)</td></tr>
+                        <tr><td>Monastery</td><td>NCC</td><td>(2, -3)</td><td>(2, 3)</td></tr>
+                        <tr><td>Tobolsk</td><td>L2</td><td>(3, 3)</td><td>(3, 6)</td></tr>
+                        <tr><td>Tobolsk</td><td>NCC</td><td>(3, 3)</td><td>(3, 6)</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="gallery">
+                <figure>
+                    <img src="./images/cathedral_single_ncc.jpg" alt="Cathedral single-scale NCC">
+                    <figcaption><strong>Cathedral</strong><br>G: (2, 5), R: (3, 12)</figcaption>
+                </figure>
+                <figure>
+                    <img src="./images/monastery_single_ncc.jpg" alt="Monastery single-scale NCC">
+                    <figcaption><strong>Monastery</strong><br>G: (2, -3), R: (2, 3)</figcaption>
+                </figure>
+                <figure>
+                    <img src="./images/tobolsk_single_ncc.jpg" alt="Tobolsk single-scale NCC">
+                    <figcaption><strong>Tobolsk</strong><br>G: (3, 3), R: (3, 6)</figcaption>
+                </figure>
+            </div>
+
+            <div class="note">L2 and NCC produced identical final offsets on the three low-resolution examples.</div>
+        </section>
+
+        <section class="part">
+            <h2>Border Exclusion During Scoring</h2>
+            <p>
+                Borders in glass-plate scans often contain black margins, scratches, or mismatched framing that can bias the objective. I tested border exclusions of 0%, 5%, 10%, and 15%. The estimated offsets became stable for all three JPEG examples at 10%, and remained unchanged at 15%, so I selected 10% as the smallest stable scoring crop.
+            </p>
+            <div class="formula-block">Tested border exclusion: 0%, 5%, 10%, 15%
+Chosen value for scoring: 10%</div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Border Excluded During Scoring</th>
+                            <th>Cathedral G / R (x, y)</th>
+                            <th>Monastery G / R (x, y)</th>
+                            <th>Tobolsk G / R (x, y)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>0%</td>
+                            <td>(-1, 1) / (-1, 7)</td>
+                            <td>(0, -6) / (1, 9)</td>
+                            <td>(2, 3) / (3, 6)</td>
+                        </tr>
+                        <tr>
+                            <td>5%</td>
+                            <td>(2, 5) / (3, 12)</td>
+                            <td>(2, -3) / (2, 3)</td>
+                            <td>(2, 3) / (3, 6)</td>
+                        </tr>
+                        <tr>
+                            <td>10%</td>
+                            <td>(2, 5) / (3, 12)</td>
+                            <td>(2, -3) / (2, 3)</td>
+                            <td>(3, 3) / (3, 6)</td>
+                        </tr>
+                        <tr>
+                            <td>15%</td>
+                            <td>(2, 5) / (3, 12)</td>
+                            <td>(2, -3) / (2, 3)</td>
+                            <td>(3, 3) / (3, 6)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p>
+                This 10% crop is applied only when computing alignment scores. After final shifts are found, I also remove only invalid overlap regions introduced by np.roll wraparound. I did not implement automatic plate-border detection and removal.
+            </p>
+        </section>
+
+        <section class="part">
+            <h2>Multi-Scale Image Pyramid</h2>
+            <p>
+                Exhaustive search at full TIFF resolution is expensive and large shifts may exceed a small local window. I therefore align from coarse to fine using four downsampling stages, then refine around the upscaled estimate at each level.
+            </p>
+            <div class="formula-block">1) Downsample by factor 2 repeatedly
+2) Coarsest level search in ±15
+3) Move to finer level
+4) Double previous displacement estimate
+5) Local refinement in ±2
+6) Repeat to full resolution</div>
+            <p>
+                Final pipeline settings are fixed across images: blue reference channel, 10% scoring crop, four pyramid stages, ±15 coarse search, and ±2 refinement search.
+            </p>
+        </section>
+
+        <section class="part">
+            <h2>Provided Dataset Results</h2>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Image</th>
+                            <th>Green Offset (x, y)</th>
+                            <th>Red Offset (x, y)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Cathedral</td><td>(2, 5)</td><td>(3, 12)</td></tr>
+                        <tr><td>Monastery</td><td>(2, -3)</td><td>(2, 3)</td></tr>
+                        <tr><td>Tobolsk</td><td>(3, 3)</td><td>(3, 6)</td></tr>
+                        <tr><td>Church</td><td>(4, 25)</td><td>(-4, 58)</td></tr>
+                        <tr><td>Emir (raw NCC)</td><td>(24, 49)</td><td>(-205, 141)</td></tr>
+                        <tr><td>Harvesters</td><td>(17, 60)</td><td>(13, 124)</td></tr>
+                        <tr><td>Icon</td><td>(17, 41)</td><td>(23, 89)</td></tr>
+                        <tr><td>Ilemselga</td><td>(7, 40)</td><td>(11, 130)</td></tr>
+                        <tr><td>Melons</td><td>(11, 82)</td><td>(13, 178)</td></tr>
+                        <tr><td>Religious Painting</td><td>(3, 28)</td><td>(7, 68)</td></tr>
+                        <tr><td>Self Portrait</td><td>(29, 79)</td><td>(37, 176)</td></tr>
+                        <tr><td>Siren</td><td>(-6, 49)</td><td>(-25, 96)</td></tr>
+                        <tr><td>Three Generations</td><td>(14, 53)</td><td>(11, 112)</td></tr>
+                        <tr><td>Wharf</td><td>(-7, 15)</td><td>(-16, 83)</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <p>
+                The pyramid pipeline was also run on Cathedral, Monastery, and Tobolsk. It produced the same offsets and reconstructed images as the single-scale NCC results shown above, so those three images are not repeated in the gallery below.
+            </p>
+
+            <div class="gallery">
+                <figure>
+                    <img src="./images/church_pyramid_ncc_raw.jpg" alt="Church pyramid NCC">
+                    <figcaption><strong>Church</strong><br>G: (4, 25), R: (-4, 58)</figcaption>
+                </figure>
+                <figure>
+                    <img src="./images/emir_pyramid_ncc_raw.jpg" alt="Emir pyramid raw NCC">
+                    <figcaption><strong>Emir (Raw NCC)</strong><br>G: (24, 49), R: (-205, 141)<br><em>Baseline failure - corrected below</em></figcaption>
+                </figure>
+                <figure>
+                    <img src="./images/harvesters_pyramid_ncc_raw.jpg" alt="Harvesters pyramid NCC">
+                    <figcaption><strong>Harvesters</strong><br>G: (17, 60), R: (13, 124)</figcaption>
+                </figure>
+                <figure>
+                    <img src="./images/icon_pyramid_ncc_raw.jpg" alt="Icon pyramid NCC">
+                    <figcaption><strong>Icon</strong><br>G: (17, 41), R: (23, 89)</figcaption>
+                </figure>
+                <figure>
+                    <img src="./images/ilemselga_pyramid_ncc_raw.jpg" alt="Ilemselga pyramid NCC">
+                    <figcaption><strong>Ilemselga</strong><br>G: (7, 40), R: (11, 130)</figcaption>
+                </figure>
+                <figure>
+                    <img src="./images/melons_pyramid_ncc_raw.jpg" alt="Melons pyramid NCC">
+                    <figcaption><strong>Melons</strong><br>G: (11, 82), R: (13, 178)</figcaption>
+                </figure>
+                <figure>
+                    <img src="./images/religious_painting_pyramid_ncc_raw.jpg" alt="Religious painting pyramid NCC">
+                    <figcaption><strong>Religious Painting</strong><br>G: (3, 28), R: (7, 68)</figcaption>
+                </figure>
+                <figure>
+                    <img src="./images/self_portrait_pyramid_ncc_raw.jpg" alt="Self portrait pyramid NCC">
+                    <figcaption><strong>Self Portrait</strong><br>G: (29, 79), R: (37, 176)</figcaption>
+                </figure>
+                <figure>
+                    <img src="./images/siren_pyramid_ncc_raw.jpg" alt="Siren pyramid NCC">
+                    <figcaption><strong>Siren</strong><br>G: (-6, 49), R: (-25, 96)</figcaption>
+                </figure>
+                <figure>
+                    <img src="./images/three_generations_pyramid_ncc_raw.jpg" alt="Three generations pyramid NCC">
+                    <figcaption><strong>Three Generations</strong><br>G: (14, 53), R: (11, 112)</figcaption>
+                </figure>
+                <figure>
+                    <img src="./images/wharf_pyramid_ncc_raw.jpg" alt="Wharf pyramid NCC">
+                    <figcaption><strong>Wharf</strong><br>G: (-7, 15), R: (-16, 83)</figcaption>
+                </figure>
+            </div>
+        </section>
+
+        <section class="part">
+            <h2>Bells &amp; Whistles: Better Features - Emir of Bukhara</h2>
+            <p>
+                As an optional Bells &amp; Whistles extension, I implemented edge-based alignment to address the raw-pixel NCC failure on Emir. Raw-pixel NCC performs well on most examples but fails for Emir due to strong cross-channel brightness differences in the clothing and scene content. The green channel aligns correctly at (24, 49), but raw NCC places the red channel at (-205, 141), causing severe color ghosting.
+            </p>
+            <p>
+                I addressed this by computing Sobel edge magnitude and running the same pyramid NCC alignment on edge features instead of raw intensities. This emphasizes geometric structure over absolute color brightness. Sobel edges are used only to estimate channel displacements; the resulting offsets are then applied to the original red and green intensity channels to reconstruct the final RGB image.
+            </p>
+            <div class="formula-block">$$
+M = \sqrt{G_x^2 + G_y^2}
+$$</div>
+            <p>
+                Here, $G_x$ and $G_y$ are the horizontal and vertical Sobel gradients, and $M$ is the edge-magnitude image used for matching.
+            </p>
+            <div class="image-pair">
+                <figure>
+                    <img src="./images/emir_pyramid_ncc_raw.jpg" alt="Emir raw NCC misalignment">
+                    <figcaption><strong>Before (Raw NCC)</strong><br>G: (24, 49), R: (-205, 141)</figcaption>
+                </figure>
+                <figure>
+                    <img src="./images/emir_pyramid_ncc_edges.jpg" alt="Emir Sobel edge corrected alignment">
+                    <figcaption><strong>After (Sobel-Edge NCC)</strong><br>G: (24, 49), R: (40, 107)</figcaption>
+                </figure>
+            </div>
+            <div class="note">Edge-based matching is more robust for Emir because it aligns structural boundaries instead of raw cross-channel brightness.</div>
+        </section>
+
+        <section class="part">
+            <h2>Additional Prokudin-Gorskii Images</h2>
+            <p>
+                I also tested the same raw-pixel pyramid NCC pipeline, without changing any parameters, on three additional high-resolution images from the <a href="https://www.loc.gov/collections/prokudin-gorskii/?st=gallery" target="_blank" rel="noopener noreferrer">Library of Congress Prokudin-Gorskii collection</a>: Capri, Chapel, and Lugano.
+            </p>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Image</th>
+                            <th>Green Offset (x, y)</th>
+                            <th>Red Offset (x, y)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Capri</td><td>(-13, 45)</td><td>(-11, 103)</td></tr>
+                        <tr><td>Chapel</td><td>(2, 34)</td><td>(-1, 116)</td></tr>
+                        <tr><td>Lugano</td><td>(13, 37)</td><td>(38, 86)</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="gallery">
+                <figure>
+                    <img src="./images/capri_pyramid_ncc_raw.jpg" alt="Capri custom result">
+                    <figcaption><strong>Capri</strong><br>G: (-13, 45), R: (-11, 103)</figcaption>
+                </figure>
+                <figure>
+                    <img src="./images/chapel_pyramid_ncc_raw.jpg" alt="Chapel custom result">
+                    <figcaption><strong>Chapel</strong><br>G: (2, 34), R: (-1, 116)</figcaption>
+                </figure>
+                <figure>
+                    <img src="./images/lugano_pyramid_ncc_raw.jpg" alt="Lugano custom result">
+                    <figcaption><strong>Lugano</strong><br>G: (13, 37), R: (38, 86)</figcaption>
+                </figure>
+            </div>
+        </section>
+
+        <section class="part">
+            <h2>Limitations</h2>
+            <p>
+                Most images align cleanly after translation, but some still show colored bands near plate boundaries because original exposure borders are not identical. I did not implement automatic border detection and removal, since it is an optional extension.
+            </p>
+            <p>
+                Some residual local fringing can also remain around moving subjects because the three filtered exposures were captured sequentially. A single global translation cannot perfectly correct object motion between exposures.
+            </p>
+            <p>
+                For example, small color fringes around some people in Harvesters may reflect movement between exposures rather than an incorrect global channel shift.
+            </p>
+        </section>
+
+        <section class="part">
+            <h2>Conclusion</h2>
+            <p>
+                This project shows that a simple translation-based alignment can reconstruct convincing color from Prokudin-Gorskii plates. Exhaustive search is effective for small JPEGs, while a coarse-to-fine pyramid makes the method practical for large TIFF scans. Border exclusion improves metric stability, and fixed pyramid parameters generalize across the provided dataset and custom examples. The key failure case was Emir, where raw cross-channel intensity matching breaks down; replacing raw intensity with Sobel edge magnitude corrected the alignment without changing the core search procedure.
+            </p>
+        </section>
+    </div>
+</body>
+
+</html>
