@@ -102,6 +102,12 @@
             text-align: center;
         }
 
+        .project-title .subtitle {
+            margin-top: 0.35rem;
+            font-size: 1rem;
+            color: var(--muted);
+        }
+
         .part {
             margin-bottom: clamp(2.5rem, 6vw, 5rem);
             padding: clamp(18px, 3vw, 30px);
@@ -281,8 +287,8 @@
 
         <section class="project-title">
             <h1>Project 1: Images of the Russian Empire</h1>
-            <p>Colorizing the Prokudin-Gorskii Photo Collection</p>
-            <p>
+            <p class="subtitle">CS180: Introduction to Computer Vision and Computational Photography</p>
+            <p class="project-summary">
                 This project reconstructs color photographs from glass-plate scans by aligning the green and red exposures to the blue reference channel. I implemented single-scale exhaustive search for low-resolution JPEGs and a coarse-to-fine image pyramid for full-resolution TIFF scans. I evaluated L2 and NCC for single-scale alignment and used raw-pixel NCC as the baseline metric for the final pyramid pipeline. As an optional Bells & Whistles extension, I used Sobel edge features to correct the difficult Emir image.
             </p>
         </section>
@@ -297,7 +303,7 @@
             </p>
             <div class="single-image">
                 <figure>
-                    <img src="./images/cathedral_raw.jpg" alt="Raw stacked glass plate">
+                    <img src="./media/cathedral_raw.jpg" alt="Raw stacked glass plate">
                     <figcaption>Example stacked plate: top is blue, middle is green, bottom is red.</figcaption>
                 </figure>
             </div>
@@ -320,7 +326,7 @@ $$
 \frac{(I_1 - \bar{I}_1) \cdot (I_2 - \bar{I}_2)}{\lVert I_1 - \bar{I}_1 \rVert_2\,\lVert I_2 - \bar{I}_2 \rVert_2}
 $$</div>
             <p>
-                Smaller $L_2$ is better; larger NCC is better.
+                Smaller $L_2$ is better, larger NCC is better.
             </p>
             <p>
                 Offset convention for all tables on this page is (x, y), where positive x shifts right and positive y shifts down.
@@ -349,15 +355,15 @@ $$</div>
 
             <div class="gallery">
                 <figure>
-                    <img src="./images/cathedral_single_ncc.jpg" alt="Cathedral single-scale NCC">
+                    <img src="./media/cathedral_single_ncc.jpg" alt="Cathedral single-scale NCC">
                     <figcaption><strong>Cathedral</strong><br>G: (2, 5), R: (3, 12)</figcaption>
                 </figure>
                 <figure>
-                    <img src="./images/monastery_single_ncc.jpg" alt="Monastery single-scale NCC">
+                    <img src="./media/monastery_single_ncc.jpg" alt="Monastery single-scale NCC">
                     <figcaption><strong>Monastery</strong><br>G: (2, -3), R: (2, 3)</figcaption>
                 </figure>
                 <figure>
-                    <img src="./images/tobolsk_single_ncc.jpg" alt="Tobolsk single-scale NCC">
+                    <img src="./media/tobolsk_single_ncc.jpg" alt="Tobolsk single-scale NCC">
                     <figcaption><strong>Tobolsk</strong><br>G: (3, 3), R: (3, 6)</figcaption>
                 </figure>
             </div>
@@ -466,47 +472,47 @@ Chosen value for scoring: 10%</div>
 
             <div class="gallery">
                 <figure>
-                    <img src="./images/church_pyramid_ncc_raw.jpg" alt="Church pyramid NCC">
+                    <img src="./media/church_pyramid_ncc_raw.jpg" alt="Church pyramid NCC">
                     <figcaption><strong>Church</strong><br>G: (4, 25), R: (-4, 58)</figcaption>
                 </figure>
                 <figure>
-                    <img src="./images/emir_pyramid_ncc_raw.jpg" alt="Emir pyramid raw NCC">
+                    <img src="./media/emir_pyramid_ncc_raw.jpg" alt="Emir pyramid raw NCC">
                     <figcaption><strong>Emir (Raw NCC)</strong><br>G: (24, 49), R: (-205, 141)<br><em>Baseline failure - corrected below</em></figcaption>
                 </figure>
                 <figure>
-                    <img src="./images/harvesters_pyramid_ncc_raw.jpg" alt="Harvesters pyramid NCC">
+                    <img src="./media/harvesters_pyramid_ncc_raw.jpg" alt="Harvesters pyramid NCC">
                     <figcaption><strong>Harvesters</strong><br>G: (17, 60), R: (13, 124)</figcaption>
                 </figure>
                 <figure>
-                    <img src="./images/icon_pyramid_ncc_raw.jpg" alt="Icon pyramid NCC">
+                    <img src="./media/icon_pyramid_ncc_raw.jpg" alt="Icon pyramid NCC">
                     <figcaption><strong>Icon</strong><br>G: (17, 41), R: (23, 89)</figcaption>
                 </figure>
                 <figure>
-                    <img src="./images/ilemselga_pyramid_ncc_raw.jpg" alt="Ilemselga pyramid NCC">
+                    <img src="./media/ilemselga_pyramid_ncc_raw.jpg" alt="Ilemselga pyramid NCC">
                     <figcaption><strong>Ilemselga</strong><br>G: (7, 40), R: (11, 130)</figcaption>
                 </figure>
                 <figure>
-                    <img src="./images/melons_pyramid_ncc_raw.jpg" alt="Melons pyramid NCC">
+                    <img src="./media/melons_pyramid_ncc_raw.jpg" alt="Melons pyramid NCC">
                     <figcaption><strong>Melons</strong><br>G: (11, 82), R: (13, 178)</figcaption>
                 </figure>
                 <figure>
-                    <img src="./images/religious_painting_pyramid_ncc_raw.jpg" alt="Religious painting pyramid NCC">
+                    <img src="./media/religious_painting_pyramid_ncc_raw.jpg" alt="Religious painting pyramid NCC">
                     <figcaption><strong>Religious Painting</strong><br>G: (3, 28), R: (7, 68)</figcaption>
                 </figure>
                 <figure>
-                    <img src="./images/self_portrait_pyramid_ncc_raw.jpg" alt="Self portrait pyramid NCC">
+                    <img src="./media/self_portrait_pyramid_ncc_raw.jpg" alt="Self portrait pyramid NCC">
                     <figcaption><strong>Self Portrait</strong><br>G: (29, 79), R: (37, 176)</figcaption>
                 </figure>
                 <figure>
-                    <img src="./images/siren_pyramid_ncc_raw.jpg" alt="Siren pyramid NCC">
+                    <img src="./media/siren_pyramid_ncc_raw.jpg" alt="Siren pyramid NCC">
                     <figcaption><strong>Siren</strong><br>G: (-6, 49), R: (-25, 96)</figcaption>
                 </figure>
                 <figure>
-                    <img src="./images/three_generations_pyramid_ncc_raw.jpg" alt="Three generations pyramid NCC">
+                    <img src="./media/three_generations_pyramid_ncc_raw.jpg" alt="Three generations pyramid NCC">
                     <figcaption><strong>Three Generations</strong><br>G: (14, 53), R: (11, 112)</figcaption>
                 </figure>
                 <figure>
-                    <img src="./images/wharf_pyramid_ncc_raw.jpg" alt="Wharf pyramid NCC">
+                    <img src="./media/wharf_pyramid_ncc_raw.jpg" alt="Wharf pyramid NCC">
                     <figcaption><strong>Wharf</strong><br>G: (-7, 15), R: (-16, 83)</figcaption>
                 </figure>
             </div>
@@ -518,7 +524,7 @@ Chosen value for scoring: 10%</div>
                 As an optional Bells &amp; Whistles extension, I implemented edge-based alignment to address the raw-pixel NCC failure on Emir. Raw-pixel NCC performs well on most examples but fails for Emir due to strong cross-channel brightness differences in the clothing and scene content. The green channel aligns correctly at (24, 49), but raw NCC places the red channel at (-205, 141), causing severe color ghosting.
             </p>
             <p>
-                I addressed this by computing Sobel edge magnitude and running the same pyramid NCC alignment on edge features instead of raw intensities. This emphasizes geometric structure over absolute color brightness. Sobel edges are used only to estimate channel displacements; the resulting offsets are then applied to the original red and green intensity channels to reconstruct the final RGB image.
+                I addressed this by computing Sobel edge magnitude and running the same pyramid NCC alignment on edge features instead of raw intensities. This emphasizes geometric structure over absolute color brightness. Sobel edges are used only to estimate channel displacements, the resulting offsets are then applied to the original red and green intensity channels to reconstruct the final RGB image.
             </p>
             <div class="formula-block">$$
 M = \sqrt{G_x^2 + G_y^2}
@@ -528,11 +534,11 @@ $$</div>
             </p>
             <div class="image-pair">
                 <figure>
-                    <img src="./images/emir_pyramid_ncc_raw.jpg" alt="Emir raw NCC misalignment">
+                    <img src="./media/emir_pyramid_ncc_raw.jpg" alt="Emir raw NCC misalignment">
                     <figcaption><strong>Before (Raw NCC)</strong><br>G: (24, 49), R: (-205, 141)</figcaption>
                 </figure>
                 <figure>
-                    <img src="./images/emir_pyramid_ncc_edges.jpg" alt="Emir Sobel edge corrected alignment">
+                    <img src="./media/emir_pyramid_ncc_edges.jpg" alt="Emir Sobel edge corrected alignment">
                     <figcaption><strong>After (Sobel-Edge NCC)</strong><br>G: (24, 49), R: (40, 107)</figcaption>
                 </figure>
             </div>
@@ -562,15 +568,15 @@ $$</div>
             </div>
             <div class="gallery">
                 <figure>
-                    <img src="./images/capri_pyramid_ncc_raw.jpg" alt="Capri custom result">
+                    <img src="./media/capri_pyramid_ncc_raw.jpg" alt="Capri custom result">
                     <figcaption><strong>Capri</strong><br>G: (-13, 45), R: (-11, 103)</figcaption>
                 </figure>
                 <figure>
-                    <img src="./images/chapel_pyramid_ncc_raw.jpg" alt="Chapel custom result">
+                    <img src="./media/chapel_pyramid_ncc_raw.jpg" alt="Chapel custom result">
                     <figcaption><strong>Chapel</strong><br>G: (2, 34), R: (-1, 116)</figcaption>
                 </figure>
                 <figure>
-                    <img src="./images/lugano_pyramid_ncc_raw.jpg" alt="Lugano custom result">
+                    <img src="./media/lugano_pyramid_ncc_raw.jpg" alt="Lugano custom result">
                     <figcaption><strong>Lugano</strong><br>G: (13, 37), R: (38, 86)</figcaption>
                 </figure>
             </div>
@@ -592,7 +598,7 @@ $$</div>
         <section class="part">
             <h2>Conclusion</h2>
             <p>
-                This project shows that a simple translation-based alignment can reconstruct convincing color from Prokudin-Gorskii plates. Exhaustive search is effective for small JPEGs, while a coarse-to-fine pyramid makes the method practical for large TIFF scans. Border exclusion improves metric stability, and fixed pyramid parameters generalize across the provided dataset and custom examples. The key failure case was Emir, where raw cross-channel intensity matching breaks down; replacing raw intensity with Sobel edge magnitude corrected the alignment without changing the core search procedure.
+                This project shows that a simple translation-based alignment can reconstruct convincing color from Prokudin-Gorskii plates. Exhaustive search is effective for small JPEGs, while a coarse-to-fine pyramid makes the method practical for large TIFF scans. Border exclusion improves metric stability, and fixed pyramid parameters generalize across the provided dataset and custom examples. The key failure case was Emir, where raw cross-channel intensity matching breaks down, replacing raw intensity with Sobel edge magnitude corrected the alignment without changing the core search procedure.
             </p>
         </section>
     </div>

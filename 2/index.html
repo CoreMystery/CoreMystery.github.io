@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project 2 | CS180</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    { left: "$$", right: "$$", display: true },
+                    { left: "$", right: "$", display: false }
+                ]
+            });
+        });
+    </script>
+
+    <style>
+        @import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Manrope:wght@400;500;700&display=swap");
+
+        :root {
+            --page-bg-1: #f4f9ff;
+            --page-bg-2: #eef3f8;
+            --panel-bg: rgba(255, 255, 255, 0.9);
+            --card-shadow: 0 20px 48px rgba(15, 23, 42, 0.1);
+            --text: #1c2433;
+            --muted: #59657d;
+            --border: rgba(133, 156, 192, 0.25);
+            --accent: #1157a7;
+            --accent-2: #0e447f;
+            --code-bg: #f4f7fb;
+            --code-border: rgba(17, 87, 167, 0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Manrope", "Segoe UI", Tahoma, sans-serif;
+            background:
+                radial-gradient(circle at 12% 0%, rgba(127, 197, 255, 0.28) 0%, rgba(127, 197, 255, 0) 48%),
+                linear-gradient(180deg, var(--page-bg-1) 0%, var(--page-bg-2) 100%);
+            color: var(--text);
+            line-height: 1.78;
+        }
+
+        .project-page {
+            width: min(100%, 1120px);
+            margin: 0 auto;
+            padding: clamp(24px, 5vw, 56px) clamp(16px, 3vw, 32px) 96px;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 20px;
+            padding: 10px 16px;
+            color: #fff;
+            text-decoration: none;
+            font-weight: 700;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+            box-shadow: 0 10px 26px rgba(17, 87, 167, 0.25);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .back-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 14px 32px rgba(17, 87, 167, 0.3);
+        }
+
+        .project-title {
+            text-align: center;
+            margin-bottom: clamp(2.1rem, 5vw, 4rem);
+        }
+
+        .project-title h1 {
+            margin: 0 0 8px;
+            font-family: "Fraunces", Georgia, serif;
+            font-size: clamp(2.1rem, 4vw, 3.4rem);
+            line-height: 1.12;
+            letter-spacing: -0.04em;
+        }
+
+        .project-title p {
+            margin: 0.25rem auto 0;
+            max-width: 74ch;
+            color: var(--muted);
+            text-align: center;
+        }
+
+        .project-title .subtitle {
+            margin-top: 0.35rem;
+            font-size: 1rem;
+            color: var(--muted);
+        }
+
+        .toc {
+            margin: 0 auto 28px;
+            padding: 18px 20px 16px;
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.82);
+            box-shadow: var(--card-shadow);
+        }
+
+        .toc h3 {
+            margin: 0 0 14px;
+            text-align: center;
+            font-size: 1.06rem;
+            letter-spacing: 0.02em;
+            text-transform: uppercase;
+            color: var(--accent-2);
+        }
+
+        .toc-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 10px 18px;
+        }
+
+        .toc-list li {
+            padding: 8px 10px;
+            border-left: 3px solid rgba(17, 87, 167, 0.25);
+            background: rgba(17, 87, 167, 0.03);
+            border-radius: 8px;
+        }
+
+        .toc-list a {
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .toc-list a:hover {
+            color: var(--accent);
+        }
+
+        .part {
+            margin-bottom: clamp(2.5rem, 6vw, 5rem);
+            padding: clamp(18px, 3vw, 30px);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            background: var(--panel-bg);
+            box-shadow: var(--card-shadow);
+        }
+
+        .part h2 {
+            margin: 0 0 1rem;
+            font-family: "Fraunces", Georgia, serif;
+            font-size: clamp(1.45rem, 2.6vw, 2.2rem);
+            letter-spacing: -0.03em;
+            text-align: center;
+        }
+
+        .part h3 {
+            margin: 1.2rem 0 0.35rem;
+            font-size: clamp(1.1rem, 1.8vw, 1.45rem);
+            color: #233551;
+        }
+
+        .part h4 {
+            margin: 1rem 0 0.4rem;
+            font-size: 1.08rem;
+            color: #2b405d;
+        }
+
+        p {
+            max-width: 76ch;
+            margin: 0.8rem auto 0;
+            text-align: left;
+            hyphens: none;
+            overflow-wrap: normal;
+        }
+
+        .list-tight {
+            max-width: 76ch;
+            margin: 0.8rem auto 0;
+            padding-left: 1.2rem;
+        }
+
+        .list-tight li {
+            margin-bottom: 0.35rem;
+        }
+
+        .note {
+            margin: 1rem auto 0;
+            max-width: 76ch;
+            padding: 12px 14px;
+            border-left: 4px solid var(--accent);
+            background: rgba(17, 87, 167, 0.08);
+            border-radius: 8px;
+        }
+
+        .formula-block {
+            margin: 1rem auto;
+            max-width: 76ch;
+            padding: 12px 14px;
+            border: 1px solid rgba(17, 87, 167, 0.15);
+            border-radius: 12px;
+            background: rgba(244, 247, 251, 0.9);
+            font-size: 0.97rem;
+            line-height: 1.7;
+            white-space: pre-wrap;
+        }
+
+        .formula-block .katex-display {
+            margin: 0.6rem 0;
+            text-align: center;
+        }
+
+        .formula-block .katex {
+            font-size: 1.02em;
+        }
+
+        .code-block {
+            margin: 1rem auto 0;
+            padding: 1rem 1rem 0.8rem;
+            max-width: 76ch;
+            border: 1px solid var(--code-border);
+            border-radius: 10px;
+            background: var(--code-bg);
+            overflow-x: auto;
+            font-size: 0.88rem;
+            line-height: 1.6;
+        }
+
+        pre {
+            margin: 0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-family: "Consolas", "SFMono-Regular", monospace;
+        }
+
+        .single-image,
+        .wide-figure,
+        .small-figure {
+            margin: 24px auto 10px;
+            width: min(100%, 880px);
+        }
+
+        .wide-figure {
+            width: min(100%, 1100px);
+        }
+
+        .image-pair,
+        .gallery {
+            display: grid;
+            gap: 16px;
+            margin: 20px 0 10px;
+        }
+
+        .image-pair {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .gallery {
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        }
+
+        figure {
+            margin: 0;
+            border-radius: 14px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 14px 34px rgba(15, 23, 42, 0.1);
+        }
+
+        img {
+            display: block;
+            width: 100%;
+            height: auto;
+            max-height: 72vh;
+            object-fit: contain;
+            background: rgba(133, 156, 192, 0.08);
+        }
+
+        .gallery img {
+            max-height: 300px;
+        }
+
+        .image-pair img {
+            max-height: 420px;
+        }
+
+        .single-image img,
+        .wide-figure img,
+        .small-figure img {
+            max-height: 620px;
+        }
+
+        .small-view {
+            max-width: 470px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .small-view img {
+            max-height: 420px;
+        }
+
+        figcaption {
+            margin: 10px;
+            color: var(--muted);
+            font-size: 0.95rem;
+            text-align: center;
+        }
+
+        .table-wrap {
+            max-width: 76ch;
+            margin: 1rem auto 0;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+        }
+
+        th,
+        td {
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+            padding: 10px 8px;
+            vertical-align: top;
+        }
+
+        th {
+            font-weight: 700;
+            color: #233551;
+        }
+
+        @media (max-width: 780px) {
+            .project-page {
+                padding: 20px 14px 72px;
+            }
+
+            .part {
+                padding: 16px;
+                border-radius: 16px;
+            }
+
+            .image-pair {
+                grid-template-columns: 1fr;
+            }
+
+            .single-image,
+            .wide-figure,
+            .small-figure {
+                width: 100%;
+            }
+        }
+
+        @media print {
+            body {
+                background: #fff;
+                color: #000;
+            }
+
+            .back-link,
+            .toc {
+                display: none;
+            }
+
+            .project-page {
+                width: 100%;
+                padding: 0;
+            }
+
+            .part {
+                break-inside: avoid;
+                box-shadow: none;
+                border: 1px solid #cfd7e0;
+                background: #fff;
+                margin-bottom: 25px;
+            }
+
+            figure {
+                break-inside: avoid;
+                box-shadow: none;
+            }
+
+            img {
+                max-height: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="project-page">
+        <a class="back-link" href="../index.html">← Back to Portfolio</a>
+
+        <header class="project-title">
+            <h1>Project 2: Fun with Filters and Frequencies</h1>
+            <p class="subtitle">CS180: Introduction to Computer Vision and Computational Photography</p>
+            <p class="project-summary">This project explores image filtering and spatial frequencies through convolution, edge detection, image sharpening, hybrid images, Gaussian and Laplacian stacks, and multiresolution blending.</p>
+        </header>
+
+        <nav class="toc" aria-label="Table of contents">
+            <h3>Table of Contents</h3>
+            <ul class="toc-list">
+                <li><a href="#introduction">Introduction</a></li>
+                <li><a href="#part1">Part 1: Fun with Filters</a></li>
+                <li><a href="#part1-1">1.1 Convolutions from Scratch</a></li>
+                <li><a href="#part1-2">1.2 Finite Difference Operator</a></li>
+                <li><a href="#part1-3">1.3 Derivative of Gaussian</a></li>
+                <li><a href="#part2">Part 2: Fun with Frequencies</a></li>
+                <li><a href="#part2-1">2.1 Image Sharpening</a></li>
+                <li><a href="#part2-2">2.2 Hybrid Images</a></li>
+                <li><a href="#part2-3">2.3 Gaussian and Laplacian Stacks</a></li>
+                <li><a href="#part2-4">2.4 Multiresolution Blending</a></li>
+                <li><a href="#learned">Most Important Thing I Learned</a></li>
+            </ul>
+        </nav>
+
+        <section class="part" id="introduction">
+            <h2>Introduction</h2>
+            <p>In this project, I explored how spatial filtering and frequency decomposition can be used to analyze and manipulate images. I began by implementing 2D convolution from scratch and using finite-difference filters for edge detection. I then introduced Gaussian filtering to reduce high-frequency noise and constructed Derivative of Gaussian filters.</p>
+            <p>In the second half of the project, I used frequency-based ideas for image sharpening, hybrid images, and multiresolution blending. These applications all rely on the same underlying observation: different visual structures occupy different spatial-frequency ranges. Fine texture and sharp boundaries are primarily represented by high frequencies, while large-scale shapes and gradual intensity changes are represented by low frequencies.</p>
+        </section>
+
+        <section class="part" id="part1">
+            <h2>Part 1: Fun with Filters</h2>
+
+            <section id="part1-1">
+                <h3>1.1 Convolutions from Scratch</h3>
+                <p>I implemented convolution in two forms. The four-loop implementation iterates over output pixels with two inner loops over kernel entries. The two-loop implementation still iterates over output pixels, but NumPy performs the local patch multiplication and summation in optimized compiled code. In both cases, I explicitly flipped the kernel in both dimensions because this is convolution rather than correlation. Both implementations used constant zero padding and preserved the input image size, which corresponds to a same-size output.</p>
+
+                <h4>Implementation</h4>
+                <div class="code-block">
+                    <pre><code>def convolve_four_loops(image, kernel):
+    image = image.astype(np.float32)
+    kernel = kernel.astype(np.float32)
+
+    kernel = np.flip(kernel, axis=(0, 1))
+
+    image_height, image_width = image.shape
+    kernel_height, kernel_width = kernel.shape
+
+    pad_y = kernel_height // 2
+    pad_x = kernel_width // 2
+
+    padded_image = np.pad(
+        image,
+        ((pad_y, pad_y), (pad_x, pad_x)),
+        mode="constant",
+        constant_values=0
+    )
+
+    output = np.zeros_like(image, dtype=np.float32)
+
+    for y in range(image_height):
+        for x in range(image_width):
+            for ky in range(kernel_height):
+                for kx in range(kernel_width):
+                    output[y, x] += (padded_image[y + ky, x + kx] * kernel[ky, kx])
+
+    return output</code></pre>
+                </div>
+
+                <div class="code-block">
+                    <pre><code>def convolve_two_loops(image, kernel):
+    image = image.astype(np.float32)
+    kernel = kernel.astype(np.float32)
+
+    kernel = np.flip(kernel, axis=(0, 1))
+
+    image_height, image_width = image.shape
+    kernel_height, kernel_width = kernel.shape
+
+    pad_y = kernel_height // 2
+    pad_x = kernel_width // 2
+
+    padded_image = np.pad(
+        image,
+        ((pad_y, pad_y), (pad_x, pad_x)),
+        mode="constant",
+        constant_values=0
+    )
+
+    output = np.zeros_like(image, dtype=np.float32)
+
+    for y in range(image_height):
+        for x in range(image_width):
+            region = padded_image[
+                y : y + kernel_height,
+                x : x + kernel_width
+            ]
+
+            output[y, x] = np.sum(region * kernel)
+
+    return output</code></pre>
+                </div>
+
+                <p>I verified my custom results against SciPy's <code>scipy.signal.convolve2d</code>. The measured runtimes were approximately:</p>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr><th>Method</th><th>Runtime</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Four-loop implementation</td><td>3.5960 s</td></tr>
+                            <tr><td>Two-loop implementation</td><td>0.7412 s</td></tr>
+                            <tr><td>scipy.signal.convolve2d</td><td>0.0132 s</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <p>The four-loop version is slow because multiplication and accumulation happen in Python loops. The two-loop version is substantially faster because NumPy processes each extracted patch in optimized compiled code. SciPy is much faster because the convolution routine itself is heavily optimized.</p>
+
+                <p>My custom convolution functions also used constant zero padding. This preserves the image dimensions and allows valid convolution near the edges, but it implicitly treats pixels outside the image as zero, which can introduce artificial boundary responses around the border.</p>
+
+                <h4>9×9 Box Filter</h4>
+                <div class="code-block">
+                    <pre><code>box_filter = np.ones((9, 9), dtype=np.float32) / 81.0
+box_filtered = convolve_four_loops(gray_image, box_filter)</code></pre>
+                </div>
+                <div class="formula-block">
+                    <span>$B = \frac{1}{81}\,\mathbf{1}_{9\times 9}$</span>
+                </div>
+                <p>The coefficients sum to 1, so this box filter computes a local neighborhood average without intentionally changing the DC brightness of a constant region. It suppresses fine-scale detail and makes the image visibly smoother.</p>
+                <figure class="single-image">
+                    <img src="./media/part1_1_box_filter.png" alt="9 by 9 box filter applied to an image, smoothing fine detail and reducing high-frequency texture." loading="lazy">
+                    <figcaption>9×9 box filtering. The box filter replaces each pixel with the average of its local neighborhood, suppressing fine-scale image detail and producing a visibly smoother image.</figcaption>
+                </figure>
+
+                <h4>Finite Differences on My Image</h4>
+                <div class="code-block">
+                    <pre><code>Dx = np.array([[1, 0, -1]], dtype=np.float32)
+Dy = np.array([[1], [0], [-1]], dtype=np.float32)
+
+dx_image = convolve_four_loops(gray_image, Dx)
+dy_image = convolve_four_loops(gray_image, Dy)</code></pre>
+                </div>
+                <div class="formula-block">
+                    <span>$D_x = \begin{bmatrix} 1 & 0 & -1 \end{bmatrix}$</span>
+                    <span>$D_y = \begin{bmatrix} 1 \\ 0 \\ -1 \end{bmatrix}$</span>
+                </div>
+                <p>Dx and Dy respond to intensity changes in different directions and therefore highlight different edge orientations. For my portrait they reveal strong transitions along horizontal and vertical structures in different parts of the image.</p>
+                <figure class="single-image">
+                    <img src="./media/part1_1_self_derivatives.png" alt="Horizontal and vertical finite-difference responses of my portrait image highlighting edges in different directions." loading="lazy">
+                    <figcaption>Finite differences applied to my image. Dx and Dy respond to intensity variation along different image directions, highlighting different sets of boundaries in the portrait.</figcaption>
+                </figure>
+            </section>
+
+            <section id="part1-2">
+                <h3>1.2 Finite Difference Operator</h3>
+                <p>I computed the derivative responses as $I_x = I * D_x$ and $I_y = I * D_y$. The derivatives are signed, so their sign indicates whether intensity is increasing or decreasing in a given direction.</p>
+                <figure class="single-image">
+                    <img src="./media/part1_2_derivatives.png" alt="Horizontal and vertical finite-difference responses emphasizing intensity transitions in different directions." loading="lazy">
+                    <figcaption>Horizontal and vertical finite-difference responses. Dx and Dy emphasize image intensity transitions in different directions.</figcaption>
+                </figure>
+
+                <p>The gradient magnitude is $\|\nabla I\| = \sqrt{I_x^2 + I_y^2}$. Large gradient magnitudes correspond to strong intensity changes and likely edges. The raw magnitude also responds to weak texture and noise, especially in textured regions such as grass.</p>
+
+                <h4>Threshold Selection</h4>
+                <p>I experimentally tested thresholds between 0.05 and 0.40. At lower thresholds, many true edges remained, but substantial weak texture and noise was also classified as edges. At higher thresholds, noise decreased, but legitimate weaker object boundaries disappeared. I selected $t = 0.20$ as a qualitative compromise that preserved the major boundaries while suppressing much of the grass noise.</p>
+                <figure class="single-image">
+                    <img src="./media/part1_2_thresholds.png" alt="Finite-difference edge threshold comparison across low and high settings, with the final threshold chosen at 0.20." loading="lazy">
+                    <figcaption>Threshold selection for finite-difference edges. Low thresholds retain many weak/noisy responses, while high thresholds begin to remove genuine boundaries. I selected t = 0.20.</figcaption>
+                </figure>
+
+                <figure class="single-image">
+                    <img src="./media/part1_2_selected_edges.png" alt="Binary edge map after thresholding the finite-difference gradient magnitude at 0.20." loading="lazy">
+                    <figcaption>Final finite-difference edge map. A threshold of 0.20 preserves the major scene boundaries while reducing background noise.</figcaption>
+                </figure>
+            </section>
+
+            <section id="part1-3">
+                <h3>1.3 Derivative of Gaussian</h3>
+                <p>Differentiation responds strongly to pixel-scale variation, which makes finite-difference results noisy. Gaussian filtering suppresses high-frequency noise before differentiation, so I smoothed the image before computing directional derivatives.</p>
+
+                <h4>Gaussian Construction</h4>
+                <p>I constructed a 1D Gaussian with <code>cv2.getGaussianKernel()</code> and formed the 2D Gaussian by the outer product $G_{2D} = g g^T$. A Gaussian has theoretically infinite support, so I truncated it at approximately $\pm 3\sigma$. In practice, I used $\text{radius} = \lceil 3\sigma \rceil$ and $\text{size} = 2\,\text{radius} + 1$. Examples: $\sigma = 0.5 \rightarrow 5\times5$, $\sigma = 1 \rightarrow 7\times7$, $\sigma = 2 \rightarrow 13\times13$, and $\sigma = 4 \rightarrow 25\times25$.</p>
+
+                <h4>Sigma Selection</h4>
+                <p>I compared Gaussian scales of $\sigma = 0.5, 1, 2, 4$. At $\sigma = 0.5$, relatively little noise was removed, larger values removed more fine variation, but very large sigma values such as 4 broadened meaningful edges excessively. I selected $\sigma = 1$, which produced a 7×7 kernel and balanced noise removal with edge preservation.</p>
+                <figure class="single-image">
+                    <img src="./media/part1_3_sigma_experiment.png" alt="Gaussian smoothing comparison across several sigma values showing the tradeoff between noise reduction and edge broadening." loading="lazy">
+                    <figcaption>Effect of Gaussian scale. Increasing Sigma removes progressively more high-frequency detail. I selected Sigma = 1 to reduce noise without excessively broadening meaningful edges.</figcaption>
+                </figure>
+
+                <h4>Gaussian + Finite Difference</h4>
+                <p>I smoothed the image first: $I_G = G * I$, then computed $I_{xG} = I_G * D_x$ and $I_{yG} = I_G * D_y$. The gradient magnitude is $\|\nabla I_G\| = \sqrt{I_{xG}^2 + I_{yG}^2}$. Compared with the raw finite-difference response, the smoothed version produced cleaner and more coherent edges, while suppressing much of the small noisy texture. Edges became slightly broader because the Gaussian spread transitions over a local region.</p>
+                <figure class="single-image">
+                    <img src="./media/part1_3_smoothing_comparison.png" alt="Finite-difference edge responses before and after Gaussian smoothing, showing cleaner extracted edges." loading="lazy">
+                    <figcaption>Finite differences before and after Gaussian smoothing. Gaussian prefiltering suppresses small high-frequency responses and produces cleaner, more coherent gradient structures.</figcaption>
+                </figure>
+
+                <h4>Smooth Edge Threshold</h4>
+                <p>I did not reuse $t = 0.20$. Gaussian smoothing changes the gradient-value distribution, so I chose a new threshold. I excluded a four-pixel border because the Gaussian radius is 3 pixels and the derivative adds another pixel affected by zero-padding behavior. I inspected positive interior gradient values and selected the 90th percentile, yielding a threshold of approximately $t = 0.1027$.</p>
+                <figure class="single-image">
+                    <img src="./media/part1_3_selected_smoothed_edges.png" alt="Binary edges after Gaussian smoothing and thresholding at the 90th percentile of interior gradient magnitudes." loading="lazy">
+                    <figcaption>Gaussian-smoothed binary edges. After smoothing with Sigma = 1, I selected the 90th percentile of positive interior gradient magnitudes, corresponding to a threshold of approximately 0.1027.</figcaption>
+                </figure>
+
+                <h4>Derivative of Gaussian</h4>
+                <p>Because convolution is associative, $(G * I) * D_x = I * (G * D_x)$. In other words, I precomputed $DoG_x = G * D_x$ and $DoG_y = G * D_y$, then convolved the original image directly with those filters. This gives the same result as smoothing first and then differentiating, but in a single combined filtering step.</p>
+                <figure class="single-image">
+                    <img src="./media/part1_3_dog_filters.png" alt="Derivative of Gaussian filters showing the positive and negative lobes that combine Gaussian smoothing with directional differentiation." loading="lazy">
+                    <figcaption>Derivative of Gaussian filters. The positive and negative lobes combine Gaussian smoothing with directional differentiation.</figcaption>
+                </figure>
+
+                <h4>Equivalence Verification</h4>
+                <p>I compared the two-stage pipeline, Gaussian blur followed by finite difference, against the single DoG convolution. The recorded maximum numerical differences were approximately $D_x = 7.01 \times 10^{-16}$, $D_y = 7.82 \times 10^{-16}$, and gradient magnitude $= 8.05 \times 10^{-16}$. <code>np.allclose()</code> returned True, which confirms that the differences are only floating-point rounding.</p>
+                <figure class="single-image">
+                    <img src="./media/part1_3_dog_equivalence.png" alt="Comparison of Gaussian blur plus finite difference to a single derivative-of-Gaussian convolution, showing they are equivalent up to floating-point precision." loading="lazy">
+                    <figcaption>Two-stage filtering versus the Derivative of Gaussian. The results are visually identical and agree numerically up to floating-point precision.</figcaption>
+                </figure>
+            </section>
+        </section>
+
+        <section class="part" id="part2">
+            <h2>Part 2: Fun with Frequencies</h2>
+
+            <section id="part2-1">
+                <h3>2.1 Image Sharpening</h3>
+                <p>Unsharp masking uses a blurred version of the image as a low-pass approximation. The high-frequency detail is $I_{high} = I - I_{low}$, and the sharpened image is $I_{sharp} = I + \alpha I_{high}$. This can be written as $I_{sharp} = I + \alpha(I - G_{\sigma} * I)$, or equivalently $I_{sharp} = (1 + \alpha)I - \alpha(G_{\sigma} * I)$. The equivalent single filter is $K_{unsharp} = (1 + \alpha)\delta - \alpha G_{\sigma}$, where $\delta$ is the impulse filter.</p>
+
+                <h4>Boundary Handling</h4>
+                <p>In my first experiments, zero-filled boundaries caused artificial dark values around the border, especially for larger Gaussian kernels. I later switched to symmetric boundary handling for the sharpening experiments, which produced more natural results. This did not require an extra figure.</p>
+
+                <h4>Taj Mahal</h4>
+                <p>I tested Gaussian scales of $\sigma = 0.5, 1, 2, 4$ and selected $\sigma = 1$ with a 7×7 kernel. This gave enough smoothing to isolate meaningful architectural detail without making the high-frequency band too broad. The high-frequency image is $I_{high} = I - I_{blurred}$, and for display only I added $+0.5$ to visualize signed differences around middle gray, this shift is not part of the sharpening computation.</p>
+                <figure class="single-image">
+                    <img src="./media/part2_1_taj_components.png" alt="Taj Mahal image decomposed into low-frequency and high-frequency components using Gaussian filtering." loading="lazy">
+                    <figcaption>Taj Mahal frequency decomposition. Gaussian filtering extracts the low-frequency image, and subtracting it from the original isolates high-frequency architectural detail. The high-frequency image is shifted by +0.5 only for visualization.</figcaption>
+                </figure>
+
+                <h4>Sharpening Amount</h4>
+                <p>I tested $\alpha = 0.5, 1.0, 1.5, 2.0$. Increasing $\alpha$ strengthens edges and texture, but overly large values become harsh and exaggerate artifacts. I selected $\alpha = 1.0$ as the best compromise between stronger detail and natural appearance.</p>
+                <figure class="single-image">
+                    <img src="./media/part2_1_taj_amounts.png" alt="Taj Mahal sharpened with several alpha values to show how unsharp-mask strength affects detail." loading="lazy">
+                    <figcaption>Effect of unsharp-mask strength. Increasing alpha strengthens high-frequency structure. I selected alpha = 1.0 to increase apparent sharpness without excessively exaggerating edges.</figcaption>
+                </figure>
+
+                <h4>Single-Filter Verification</h4>
+                <p>I compared the explicit pipeline of blur, subtract, and add with the single convolution unsharp-mask kernel. The maximum unclipped numerical difference was $1.1920929 \times 10^{-7}$, which is consistent with float32 precision and confirms the formulations are equivalent.</p>
+                <figure class="single-image">
+                    <img src="./media/part2_1_unsharp_equivalence.png" alt="Equivalent unsharp-mask results when using explicit high-pass extraction versus one combined filter." loading="lazy">
+                    <figcaption>Equivalent unsharp-mask formulations. Explicitly extracting and adding the high frequencies produces effectively the same result as applying one combined unsharp-mask filter.</figcaption>
+                </figure>
+
+                <h4>San Francisco City Hall</h4>
+                <p>This is my custom photograph. I resized the original 3072×3072 image to 1024×1024 using <code>cv.INTER_AREA</code> for downsampling. I tested Gaussian scales of 0.5, 1, 2, and 4 and selected $\sigma = 1$. I then tested $\alpha = 0.5, 1.0, 1.5, 2.0$ and selected $\alpha = 1.0$.</p>
+                <figure class="single-image">
+                    <img src="./media/part2_1_cityhall_components.png" alt="City Hall decomposed into low-frequency and high-frequency components to isolate broad structure and fine details." loading="lazy">
+                    <figcaption>City Hall frequency decomposition. The Gaussian image retains broad structure while the high-frequency image isolates fine architectural detail and edges.</figcaption>
+                </figure>
+                <figure class="single-image">
+                    <img src="./media/part2_1_cityhall_amounts.png" alt="City Hall sharpened with several alpha values, showing how stronger unsharp masking increases fine detail." loading="lazy">
+                    <figcaption>Sharpening-strength comparison for City Hall. Larger values increasingly emphasize architectural and scene boundaries, but overly large values begin to look artificially enhanced.</figcaption>
+                </figure>
+
+                <h4>Blur → Resharpen Evaluation</h4>
+                <p>This is a separate evaluation from normal sharpening. I started from the sharp City Hall photograph, intentionally blurred it with $\sigma = 2$, and then sharpened the blurred image with $\alpha = 1$. The result was crisper than the blurred image, but it did not recover the original sharp photograph because the Gaussian blur removed and attenuated high-frequency information. Unsharp masking can amplify whatever high-frequency structure remains, but it cannot reconstruct information that was actually destroyed.</p>
+                <figure class="single-image">
+                    <img src="./media/part2_1_blur_resharpen.png" alt="Blurred City Hall image sharpened again to show that sharpening can increase apparent crispness but cannot fully recover original detail after blur." loading="lazy">
+                    <figcaption>Can sharpening undo blur? Unsharp masking makes the blurred image appear crisper, but it cannot reconstruct the fine information destroyed by the original blur.</figcaption>
+                </figure>
+            </section>
+
+            <section id="part2-2">
+                <h3>2.2 Hybrid Images</h3>
+                <p>For a hybrid image, I low-pass one image and high-pass the other: $I_{low} = G_{\sigma_L} * I_L$ and $I_{high} = I_H - G_{\sigma_H} * I_H$. The hybrid is then $I_{hybrid} = I_{low} + I_{high}$. High-frequency structure tends to dominate when the image is viewed nearby or enlarged, while low-frequency structure becomes more dominant at greater distance or smaller display sizes. I created three hybrids: Derek + Nutmeg, Friend 1 + Dog, and Friend 2 + Panda.</p>
+
+                <h4>Alignment</h4>
+                <p>Before combining frequency bands, I aligned the corresponding image structures as closely as possible. For face/animal hybrids, I selected the left eye and right eye in both images and used them to estimate a similarity transform: midpoint for translation, eye-to-eye distance for scale, and eye-line angle for rotation. The moving image was then scaled, rotated, and translated to align with the reference. A 50/50 overlay was used as a visual check, and I did not include raw coordinate-debugging output in the final report.</p>
+
+                <h4>Derek + Nutmeg</h4>
+                <p>For the detailed Derek + Nutmeg example, Nutmeg contributed the low-pass component and Derek the high-pass component. Near or large viewing conditions made Derek's high-frequency structure more apparent, while the reduced image emphasized Nutmeg's low-frequency structure.</p>
+                <figure class="single-image">
+                    <img src="./media/part2_2_derek_nutmeg_inputs.png" alt="Derek and Nutmeg input images used for the hybrid image experiment." loading="lazy">
+                    <figcaption>Derek and Nutmeg input images.</figcaption>
+                </figure>
+                <figure class="single-image">
+                    <img src="./media/part2_2_derek_nutmeg_alignment.png" alt="Eye-based alignment of the Nutmeg image onto Derek using scale, rotation, and translation." loading="lazy">
+                    <figcaption>Eye-based alignment. The Nutmeg image is scaled, rotated, and translated so that its eye locations approximately coincide with Derek's. The 50/50 overlay provides a visual check of the alignment.</figcaption>
+                </figure>
+
+                <p>I first explored a broad range of cutoffs: $\sigma = 2, 4, 8, 16$. Smaller low-pass sigmas left too much fur detail, while very large sigmas removed too much facial structure. The high-pass sigma changed the scale of Derek's structures that remained in the residual.</p>
+                <figure class="single-image">
+                    <img src="./media/part2_2_low_high_pass.png" alt="Broad filter-scale experiment for low-pass and high-pass hybrid components." loading="lazy">
+                    <figcaption>Broad filter-scale experiment. Increasing the low-pass Sigma removes more of Nutmeg's fine detail, while increasing the high-pass Sigma allows progressively broader Derek structures to remain in the high-frequency component.</figcaption>
+                </figure>
+
+                <p>I refined the cutoff search around the promising ranges and tested low-pass sigmas $4, 5, 6$ and high-pass sigmas $1, 1.5, 2$.</p>
+                <figure class="single-image">
+                    <img src="./media/part2_2_cutoff_experiment.png" alt="Refined hybrid cutoff experiment comparing low-pass and high-pass sigma choices around the most promising values." loading="lazy">
+                    <figcaption>Hybrid cutoff-frequency experiment. I compared combinations around the most promising ranges rather than selecting the cutoffs arbitrarily.</figcaption>
+                </figure>
+
+                <p>The final selected values were Nutmeg low-pass Sigma = 4 and Derek high-pass Sigma = 2. These cutoffs were chosen experimentally rather than arbitrarily.</p>
+                <div class="image-pair">
+                    <figure class="small-view">
+                        <img src="./media/part2_2_derek_nutmeg_large.png" alt="Final Derek and Nutmeg hybrid viewed at full scale with Derek's high-frequency structure visible." loading="lazy">
+                        <figcaption>Large View</figcaption>
+                    </figure>
+                    <figure class="small-view">
+                        <img src="./media/part2_2_derek_nutmeg_small.png" alt="Final Derek and Nutmeg hybrid viewed at reduced scale so Nutmeg's low-frequency structure becomes more dominant." loading="lazy">
+                        <figcaption>Small View</figcaption>
+                    </figure>
+                </div>
+                <p class="note">Final Derek + Nutmeg hybrid. At large scale, Derek's high-frequency structure is more visible. In the reduced image, these fine details are suppressed by viewing scale and Nutmeg's low-frequency structure becomes more dominant.</p>
+
+                <figure class="single-image">
+                    <img src="./media/part2_2_derek_nutmeg_large_swap.png" alt="Swapped-frequency Derek and Nutmeg hybrid for comparison, with the original roles reversed." loading="lazy">
+                    <figcaption>Swapped Derek + Nutmeg experiment. I also tested reversing the frequency roles, but the selected Nutmeg-low / Derek-high configuration produced a clearer viewing-distance transition, so I used it for the final analysis.</figcaption>
+                </figure>
+
+                <figure class="wide-figure">
+                    <img src="./media/part2_2_frequency_analysis.png" alt="Fourier-domain view of the hybrid image pipeline, showing low-pass Nutmeg energy centered near the origin and high-pass Derek energy further away." loading="lazy">
+                    <figcaption>Spatial and Fourier-domain analysis of the hybrid-image pipeline. The low-pass Nutmeg component concentrates frequency content near the Fourier origin, while the high-pass Derek component removes much of the low-frequency content. Their combination retains both frequency ranges.</figcaption>
+                </figure>
+                <p class="note">Each Fourier magnitude panel is displayed with its own plotting range, so relative brightness between separate panels should be interpreted qualitatively rather than as an absolute comparison of spectral energy.</p>
+
+                <p>I also tested reversing the frequency roles, but the selected Nutmeg-low / Derek-high configuration produced a clearer viewing-distance transition, so I used it for the final analysis.</p>
+
+                <h4>Friend 1 + Dog</h4>
+                <p>The portrait provides strong broad head and body structure, while the dog contributes distinctive fine-scale eyes, ears, muzzle, fur, mouth, and tongue. I used Friend 1 as the low-pass component and Dog as the high-pass component. The final values were Friend 1 Low Sigma = 6 and Dog High Sigma = 2.</p>
+                <figure class="single-image">
+                    <img src="./media/part2_2_friend1_dog_inputs.png" alt="Friend 1 and Dog input images for the custom hybrid-image example." loading="lazy">
+                    <figcaption>Friend 1 and Dog input images.</figcaption>
+                </figure>
+                <div class="image-pair">
+                    <figure class="small-view">
+                        <img src="./media/part2_2_friend1_dog_large.png" alt="Large view of the Friend 1 and Dog hybrid image." loading="lazy">
+                        <figcaption>Large View</figcaption>
+                    </figure>
+                    <figure class="small-view">
+                        <img src="./media/part2_2_friend1_dog_small.png" alt="Reduced-size view of the Friend 1 and Dog hybrid where the low-frequency human portrait becomes more visible." loading="lazy">
+                        <figcaption>Small View</figcaption>
+                    </figure>
+                </div>
+                <p class="note">Friend 1 + Dog hybrid. Friend 1 supplies the low-frequency structure using Low Sigma = 6, while the dog supplies high-frequency detail using High Sigma = 2. The dog is more noticeable at close viewing scale, whereas the human portrait becomes clearer when the image is reduced.</p>
+
+                <h4>Friend 2 + Panda</h4>
+                <p>This pair required stronger smoothing. Friend 2 retained more facial detail than the first custom pair, so I increased the low-pass smoothing enough for the panda's high-frequency features to stand out. The final values were Friend 2 Low Sigma = 10 and Panda High Sigma = 4.</p>
+                <figure class="single-image">
+                    <img src="./media/part2_2_friend2_panda_inputs.png" alt="Friend 2 and Panda input images for the stronger custom hybrid combination." loading="lazy">
+                    <figcaption>Friend 2 and Panda input images.</figcaption>
+                </figure>
+                <div class="image-pair">
+                    <figure class="small-view">
+                        <img src="./media/part2_2_friend2_panda_large.png" alt="Large view of the Friend 2 and Panda hybrid image." loading="lazy">
+                        <figcaption>Large View</figcaption>
+                    </figure>
+                    <figure class="small-view">
+                        <img src="./media/part2_2_friend2_panda_small.png" alt="Reduced-size view where Friend 2's broad facial structure becomes more dominant." loading="lazy">
+                        <figcaption>Small View</figcaption>
+                    </figure>
+                </div>
+                <p class="note">Friend 2 + Panda hybrid. With Friend 2 low-pass filtered at Low Sigma = 10 and the panda high-pass filtered at High Sigma = 4, the panda is prominent at close viewing scale while the human portrait becomes more dominant in the reduced image.</p>
+            </section>
+
+            <section id="part2-3">
+                <h3>2.3 Gaussian and Laplacian Stacks</h3>
+                <p>A Gaussian and Laplacian stack are not pyramids because there is no downsampling. Every level retains the same dimensions as the original image. I used five levels for the apple and orange images, with the Sigma sequence 1, 2, 4, 8 after the original.</p>
+
+                <h4>Gaussian Stack</h4>
+                <p>For the Gaussian stack, I defined $G_0 = I$, $G_1 = G_{\sigma=1} * I$, $G_2 = G_{\sigma=2} * I$, $G_3 = G_{\sigma=4} * I$, and $G_4 = G_{\sigma=8} * I$. Every image remained 300×300. Increasing Sigma removed progressively more fine texture, while the coarser images retained broad shape, shading, and color.</p>
+                <figure class="single-image">
+                    <img src="./media/part2_3_gaussian_stacks.png" alt="Gaussian stack of the apple and orange images across increasing blur scales while preserving image dimensions." loading="lazy">
+                    <figcaption>Gaussian stacks for the apple and orange. Every level has the same dimensions, but progressively larger Gaussian Sigmas remove increasingly fine frequency content.</figcaption>
+                </figure>
+
+                <h4>Laplacian Stack</h4>
+                <p>For the Laplacian stack, I used $L_i = G_i - G_{i+1}$ for all but the final level, with the final residual retained as $L_4 = G_4$. The earlier levels contain fine edges and texture, while later levels represent broader spatial structures. For visualization, signed Laplacian values are shifted by +0.5 so zero maps to middle gray, this is display-only and not part of the mathematical reconstruction.</p>
+                <figure class="single-image">
+                    <img src="./media/part2_3_laplacian_stacks.png" alt="Laplacian stack of the apple and orange images showing fine edges at small scales and broad changes at coarse scales." loading="lazy">
+                    <figcaption>Laplacian stacks for the apple and orange. Fine levels isolate local texture and edges, while later levels capture broader structures. The final column contains the coarsest Gaussian residual.</figcaption>
+                </figure>
+
+                <h4>Reconstruction Check</h4>
+                <p>The stack satisfies the telescoping identity $(G_0 - G_1) + (G_1 - G_2) + (G_2 - G_3) + (G_3 - G_4) + G_4 = G_0$. Summing the Laplacian stack reconstructs the original image. Recorded maximum reconstruction errors were approximately Apple: $2.24 \times 10^{-8}$ and Orange: $1.49 \times 10^{-8}$, which are tiny floating-point errors.</p>
+            </section>
+
+            <section id="part2-4">
+                <h3>2.4 Multiresolution Blending</h3>
+                <p>Multiresolution blending does not make a single abrupt transition between two images. Instead, image content is decomposed into Laplacian frequency bands, and a Gaussian stack of the mask controls how the transition spreads at each scale. Fine/high-frequency detail blends over relatively narrow regions, while broad/low-frequency structure transitions across wider spatial regions. The blended Laplacian levels are then summed to reconstruct the final result.</p>
+
+                <h4>Oraple</h4>
+                <p>For the apple + orange blend, I used a vertical step mask $M(x,y)=1$ for $x<W/2$ and $M(x,y)=0$ for $x\ge W/2$. White selects the apple and black selects the orange. The Gaussian mask stack gradually smoothed the hard step boundary, which makes each frequency band transition over an appropriate width.</p>
+                <figure class="single-image">
+                    <img src="./media/part2_4_oraple_mask.png" alt="Binary vertical mask separating the apple and orange regions for the Oraple blend." loading="lazy">
+                    <figcaption>Initial Oraple mask. White selects the apple and black selects the orange.</figcaption>
+                </figure>
+                <figure class="single-image">
+                    <img src="./media/part2_4_mask_stack.png" alt="Gaussian-smoothed mask stack showing the transition widens as the scale increases." loading="lazy">
+                    <figcaption>Gaussian stack of the blending mask. The originally hard center boundary becomes progressively smoother at coarser scales, allowing each frequency band to be blended over an appropriate spatial width.</figcaption>
+                </figure>
+                <p>At each Laplacian level, $B_i = M_i L_{apple,i} + (1 - M_i) L_{orange,i}$ and the final blend is $B = \sum_i B_i$.</p>
+                <figure class="wide-figure">
+                    <img src="./media/part2_4_oraple_multiresolution_process.png" alt="Figure 3.42-style multiresolution blending process showing masked apple contribution, masked orange contribution, and combined band for representative levels." loading="lazy">
+                    <figcaption>Multiresolution Oraple process. Representative Laplacian levels show the masked Apple contribution, Orange contribution, and combined band. The bottom row reconstructs the weighted contributions and final Oraple. This follows the Figure 3.42-style visualization requested in the assignment.</figcaption>
+                </figure>
+                <p>A direct half-and-half composite has an abrupt vertical discontinuity because every frequency changes at exactly the same position. The multiresolution version softens the transition: low-frequency color and shading spread over a wider region, while high-frequency texture changes much more locally.</p>
+                <figure class="single-image">
+                    <img src="./media/part2_4_oraple_comparison.png" alt="Direct blend versus multiresolution blend for the apple-orange composite." loading="lazy">
+                    <figcaption>Direct versus multiresolution blending. The direct blend creates a hard center discontinuity, while multiresolution blending produces a smoother transition by blending different frequency bands at different spatial scales.</figcaption>
+                </figure>
+
+                <h4>Custom Blend 1: Yellow + Pink Flower</h4>
+                <p>I blended photographs of a yellow flower and a pink flower. I tested vertical and horizontal seams and selected the vertical seam because it created a cleaner half-yellow/half-pink blossom while preserving the flower structure. The background did not have to align perfectly because the important correspondence was the foreground blossom.</p>
+                <figure class="single-image">
+                    <img src="./media/part2_4_flowers_inputs.png" alt="Yellow and pink flower input images for the custom multiresolution flower blend." loading="lazy">
+                    <figcaption>Yellow and pink flower input images.</figcaption>
+                </figure>
+                <figure class="single-image">
+                    <img src="./media/part2_4_flowers_alignment.png" alt="Flower alignment using top and bottom blossom landmarks to scale, rotate, and translate the pink flower onto the yellow flower." loading="lazy">
+                    <figcaption>Flower alignment. Corresponding top and bottom blossom landmarks are used to scale, rotate, and translate the pink flower onto the yellow flower. The 50/50 overlay verifies that the main blossoms are approximately aligned.</figcaption>
+                </figure>
+                <p>The final settings used 5 levels and a base sigma of 4. The blend was computed as $B_i = M_i L_{yellow,i} + (1 - M_i)L_{pink,i}$.</p>
+                <figure class="single-image">
+                    <img src="./media/part2_4_flowers_comparison.png" alt="Direct versus multiresolution blend of the yellow and pink flowers showing a smoother seam through the central petals." loading="lazy">
+                    <figcaption>Direct versus multiresolution flower blend. The direct vertical cut creates an obvious discontinuity. The multiresolution result produces a smoother transition through the central petals by blending frequency bands over different widths.</figcaption>
+                </figure>
+                <p>Because the source photographs had different backgrounds, illumination, and scene geometry, multiresolution blending could not make the entire background perfectly consistent. The method worked best around the aligned central flower, where corresponding structure existed in both images.</p>
+
+                <h4>Custom Blend 2: Sunset Shirt</h4>
+                <p>This is the required irregular-mask example. I replaced the visible shirt region in a portrait with a selected region from a sunset photograph. The mask was created by manually clicking points around the visible shirt boundary and filling the polygon, so it was not a straight-line mask.</p>
+                <figure class="single-image">
+                    <img src="./media/part2_4_sunset_shirt_inputs.png" alt="Portrait and sunset input images used for the irregular sunset-shirt blend." loading="lazy">
+                    <figcaption>Input images for the irregular-mask blend. The portrait provides the destination region, while the sunset photograph provides the replacement content.</figcaption>
+                </figure>
+                <figure class="single-image">
+                    <img src="./media/part2_4_shirt_mask.png" alt="Irregular shirt polygon mask overlaid in red on the portrait for selection verification." loading="lazy">
+                    <figcaption>Irregular shirt mask. I manually trace the visible shirt with a polygon. The red overlay verifies that the mask selects the intended clothing region.</figcaption>
+                </figure>
+                <p>I selected a sunset crop containing the sun, orange sky, and mountain silhouette, then determined the shirt-mask bounding box and resized the crop while preserving aspect ratio. I placed the fitted sunset region over the shirt's location on a full-size canvas matching the portrait dimensions.</p>
+                <figure class="single-image">
+                    <img src="./media/part2_4_sunset_selection.png" alt="Sunset crop selection and placement process before blending over the shirt region." loading="lazy">
+                    <figcaption>Selecting and positioning the source region. I manually select the portion of the sunset containing the sun and mountain, resize it while preserving aspect ratio, and position the fitted crop over the shirt's bounding region.</figcaption>
+                </figure>
+                <p>A direct binary preview was used to verify the composition before multiresolution blending:</p>
+                <div class="formula-block">
+                    <span>$I_{direct} = (1 - M)I_{portrait} + MI_{sunset}$</span>
+                </div>
+                <figure class="single-image">
+                    <img src="./media/part2_4_sunset_preview.png" alt="Direct sunset-shirt preview using a hard binary mask to verify composition before multiresolution blending." loading="lazy">
+                    <figcaption>Direct sunset-shirt preview. A hard binary mask confirms that the desired sunset region is positioned correctly inside the clothing.</figcaption>
+                </figure>
+                <p>The final multiresolution settings used 5 levels and a base sigma of 3. I constructed Gaussian/Laplacian stacks for the portrait and the positioned sunset, plus a Gaussian stack for the mask. At each level, $B_i = (1 - M_i)L_{portrait,i} + M_iL_{sunset,i}$, and the final result was $B = \sum_i B_i$.</p>
+                <figure class="single-image">
+                    <img src="./media/part2_4_sunset_comparison.png" alt="Comparison of direct and multiresolution irregular-mask blending for the sunset shirt composition." loading="lazy">
+                    <figcaption>Direct versus multiresolution irregular-mask blending. The direct mask produces a sharply cut sunset region, while the multiresolution version softens the transition around the neckline, shoulders, and sleeve.</figcaption>
+                </figure>
+                <p>The multiresolution result visibly softens the hard polygonal edge of the direct composite. Some bright color bleeding remains around the clothing boundary, particularly near the shoulders and neckline. The sunset is much brighter and warmer than the original dark shirt, and the Gaussian mask intentionally spreads low-frequency content across the boundary. This demonstrates a tradeoff: a wider blend produces a smoother seam, but strongly mismatched colors or brightness can create a visible halo.</p>
+            </section>
+        </section>
+
+        <section class="part" id="learned">
+            <h2>Most Important Thing I Learned</h2>
+            <p>The most important thing I learned from this project is how strongly image appearance depends on spatial frequency and scale. At first, edge detection, sharpening, hybrid images, and multiresolution blending seemed like separate techniques. After working through the project, I realized that they are closely connected by the same frequency-based interpretation of images.</p>
+            <p>High frequencies encode rapid spatial changes such as edges, fine texture, fur, and small architectural details, while low frequencies encode broad shape, illumination, and large-scale structure. Edge detection isolates high-frequency changes, unsharp masking increases them, hybrid images deliberately combine different frequency ranges from different images, and multiresolution blending decides how images should transition separately at each frequency scale.</p>
+            <p>I also learned that implementing the mathematical operation correctly is only part of producing a good result. Parameter selection, image alignment, boundary handling, mask design, and source-image compatibility all have a major effect on the final perceptual result. The experiments with thresholds, Gaussian Sigmas, hybrid cutoffs, and direct-versus-multiresolution blends made this especially clear.</p>
+        </section>
+    </div>
+</body>
+</html>

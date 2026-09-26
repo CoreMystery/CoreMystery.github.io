@@ -79,9 +79,17 @@
         }
 
         .project-title p {
-            margin: 0;
+            margin: 0.25rem auto 0;
+            max-width: 74ch;
             color: var(--muted);
             font-size: 1rem;
+            text-align: center;
+        }
+
+        .project-title .subtitle {
+            margin-top: 0.3rem;
+            font-size: 1rem;
+            color: var(--muted);
         }
 
         .part {
@@ -200,8 +208,11 @@
 
     <section class="project-title">
         <h1>Project 0: Becoming Friends with Your Camera</h1>
-        <p>
+        <p class="subtitle">
             CS180: Introduction to Computer Vision and Computational Photography
+        </p>
+        <p class="project-summary">
+            This project explores camera perspective and composition through close-up portraits, architectural perspective compression, and a dolly zoom sequence.
         </p>
     </section>
 
