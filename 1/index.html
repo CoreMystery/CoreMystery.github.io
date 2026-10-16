@@ -279,6 +279,7 @@
             }
         }
     </style>
+    <link rel="stylesheet" href="../project-common.css">
 </head>
 
 <body>
@@ -293,7 +294,22 @@
             </p>
         </section>
 
-        <section class="part">
+        <nav class="toc" aria-label="Table of contents">
+            <h3>Table of Contents</h3>
+            <ul class="toc-list">
+                <li><a href="#overview">Overview and Channel Splitting</a></li>
+                <li><a href="#single-scale">Single-Scale Alignment on JPEGs</a></li>
+                <li><a href="#border-exclusion">Border Exclusion During Scoring</a></li>
+                <li><a href="#multi-scale">Multi-Scale Image Pyramid</a></li>
+                <li><a href="#dataset-results">Provided Dataset Results</a></li>
+                <li><a href="#bells-whistles">Bells &amp; Whistles: Better Features - Emir of Bukhara</a></li>
+                <li><a href="#additional-images">Additional Prokudin-Gorskii Images</a></li>
+                <li><a href="#limitations">Limitations</a></li>
+                <li><a href="#conclusion">Conclusion</a></li>
+            </ul>
+        </nav>
+
+        <section class="part" id="overview">
             <h2>Overview and Channel Splitting</h2>
             <p>
                 Sergei Prokudin-Gorskii captured each scene through blue, green, and red filters. In each scanned plate, the channels are stacked vertically: blue at the top, green in the middle, and red at the bottom. I split the image into three equal-height bands, keep blue fixed as reference, and search for x and y translations that align green and red to blue.
@@ -312,7 +328,7 @@ Middle -> Green
 Bottom -> Red</div>
         </section>
 
-        <section class="part">
+        <section class="part" id="single-scale">
             <h2>Single-Scale Alignment on JPEGs</h2>
             <p>
                 For low-resolution JPEG inputs, I use exhaustive search over displacements in [-15, 15] for both axes. I evaluated both L2 distance and NCC while scoring only an interior crop to reduce border artifacts.
@@ -371,7 +387,7 @@ $$</div>
             <div class="note">L2 and NCC produced identical final offsets on the three low-resolution examples.</div>
         </section>
 
-        <section class="part">
+        <section class="part" id="border-exclusion">
             <h2>Border Exclusion During Scoring</h2>
             <p>
                 Borders in glass-plate scans often contain black margins, scratches, or mismatched framing that can bias the objective. I tested border exclusions of 0%, 5%, 10%, and 15%. The estimated offsets became stable for all three JPEG examples at 10%, and remained unchanged at 15%, so I selected 10% as the smallest stable scoring crop.
@@ -421,7 +437,7 @@ Chosen value for scoring: 10%</div>
             </p>
         </section>
 
-        <section class="part">
+        <section class="part" id="multi-scale">
             <h2>Multi-Scale Image Pyramid</h2>
             <p>
                 Exhaustive search at full TIFF resolution is expensive and large shifts may exceed a small local window. I therefore align from coarse to fine using four downsampling stages, then refine around the upscaled estimate at each level.
@@ -437,7 +453,7 @@ Chosen value for scoring: 10%</div>
             </p>
         </section>
 
-        <section class="part">
+        <section class="part" id="dataset-results">
             <h2>Provided Dataset Results</h2>
             <div class="table-wrap">
                 <table>
@@ -518,7 +534,7 @@ Chosen value for scoring: 10%</div>
             </div>
         </section>
 
-        <section class="part">
+        <section class="part" id="bells-whistles">
             <h2>Bells &amp; Whistles: Better Features - Emir of Bukhara</h2>
             <p>
                 As an optional Bells &amp; Whistles extension, I implemented edge-based alignment to address the raw-pixel NCC failure on Emir. Raw-pixel NCC performs well on most examples but fails for Emir due to strong cross-channel brightness differences in the clothing and scene content. The green channel aligns correctly at (24, 49), but raw NCC places the red channel at (-205, 141), causing severe color ghosting.
@@ -545,7 +561,7 @@ $$</div>
             <div class="note">Edge-based matching is more robust for Emir because it aligns structural boundaries instead of raw cross-channel brightness.</div>
         </section>
 
-        <section class="part">
+        <section class="part" id="additional-images">
             <h2>Additional Prokudin-Gorskii Images</h2>
             <p>
                 I also tested the same raw-pixel pyramid NCC pipeline, without changing any parameters, on three additional high-resolution images from the <a href="https://www.loc.gov/collections/prokudin-gorskii/?st=gallery" target="_blank" rel="noopener noreferrer">Library of Congress Prokudin-Gorskii collection</a>: Capri, Chapel, and Lugano.
@@ -582,7 +598,7 @@ $$</div>
             </div>
         </section>
 
-        <section class="part">
+        <section class="part" id="limitations">
             <h2>Limitations</h2>
             <p>
                 Most images align cleanly after translation, but some still show colored bands near plate boundaries because original exposure borders are not identical. I did not implement automatic border detection and removal, since it is an optional extension.
@@ -595,7 +611,7 @@ $$</div>
             </p>
         </section>
 
-        <section class="part">
+        <section class="part" id="conclusion">
             <h2>Conclusion</h2>
             <p>
                 This project shows that a simple translation-based alignment can reconstruct convincing color from Prokudin-Gorskii plates. Exhaustive search is effective for small JPEGs, while a coarse-to-fine pyramid makes the method practical for large TIFF scans. Border exclusion improves metric stability, and fixed pyramid parameters generalize across the provided dataset and custom examples. The key failure case was Emir, where raw cross-channel intensity matching breaks down, replacing raw intensity with Sobel edge magnitude corrected the alignment without changing the core search procedure.

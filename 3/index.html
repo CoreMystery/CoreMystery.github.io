@@ -1,0 +1,1442 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project 3 | CS180</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            if (window.renderMathInElement) {
+                renderMathInElement(document.body, {
+                    delimiters: [
+                        { left: "$$", right: "$$", display: true },
+                        { left: "\\[", right: "\\]", display: true },
+                        { left: "$", right: "$", display: false },
+                        { left: "\\(", right: "\\)", display: false }
+                    ]
+                });
+            }
+
+            document.querySelectorAll("img").forEach(function (img, index) {
+                if (index > 0) {
+                    img.loading = "lazy";
+                }
+            });
+        });
+    </script>
+
+    <style>
+        @import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Manrope:wght@400;500;700&display=swap");
+
+        :root {
+            --page-bg-1: #f4f9ff;
+            --page-bg-2: #eef3f8;
+            --panel-bg: rgba(255, 255, 255, 0.9);
+            --card-shadow: 0 20px 48px rgba(15, 23, 42, 0.1);
+            --text: #1c2433;
+            --muted: #59657d;
+            --border: rgba(133, 156, 192, 0.25);
+            --accent: #1157a7;
+            --accent-2: #0e447f;
+            --code-bg: #f4f7fb;
+            --code-border: rgba(17, 87, 167, 0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Manrope", "Segoe UI", Tahoma, sans-serif;
+            background:
+                radial-gradient(circle at 12% 0%, rgba(127, 197, 255, 0.28) 0%, rgba(127, 197, 255, 0) 48%),
+                linear-gradient(180deg, var(--page-bg-1) 0%, var(--page-bg-2) 100%);
+            color: var(--text);
+            line-height: 1.78;
+        }
+
+        .project-page {
+            width: min(100%, 1120px);
+            margin: 0 auto;
+            padding: clamp(24px, 5vw, 56px) clamp(16px, 3vw, 32px) 96px;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 20px;
+            padding: 10px 16px;
+            color: #fff;
+            text-decoration: none;
+            font-weight: 700;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+            box-shadow: 0 10px 26px rgba(17, 87, 167, 0.25);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .back-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 14px 32px rgba(17, 87, 167, 0.3);
+        }
+
+        .project-title {
+            text-align: center;
+            margin-bottom: clamp(2.1rem, 5vw, 4rem);
+        }
+
+        .project-title h1 {
+            margin: 0 0 8px;
+            font-family: "Fraunces", Georgia, serif;
+            font-size: clamp(2.1rem, 4vw, 3.4rem);
+            line-height: 1.12;
+            letter-spacing: -0.04em;
+        }
+
+        .project-title p {
+            margin: 0.25rem auto 0;
+            max-width: 74ch;
+            color: var(--muted);
+            text-align: center;
+        }
+
+        .project-title .subtitle {
+            margin-top: 0.35rem;
+            font-size: 1rem;
+            color: var(--muted);
+        }
+
+        .toc {
+            margin: 0 auto 28px;
+            padding: 18px 20px 16px;
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.82);
+            box-shadow: var(--card-shadow);
+        }
+
+        .toc h3 {
+            margin: 0 0 14px;
+            text-align: center;
+            font-size: 1.06rem;
+            letter-spacing: 0.02em;
+            text-transform: uppercase;
+            color: var(--accent-2);
+        }
+
+        .toc-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 10px 18px;
+        }
+
+        .toc-list > li {
+            padding: 8px 10px;
+            border-left: 3px solid rgba(17, 87, 167, 0.25);
+            background: rgba(17, 87, 167, 0.03);
+            border-radius: 8px;
+        }
+
+        .toc-sublist {
+            list-style: none;
+            padding: 0;
+            margin: 10px 0 0;
+            display: grid;
+            gap: 6px;
+        }
+
+        .toc-sublist li {
+            padding: 0;
+            border-left: none;
+            background: transparent;
+        }
+
+        .toc-list a,
+        .toc-sublist a {
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .toc-list a:hover,
+        .toc-sublist a:hover {
+            color: var(--accent);
+        }
+
+        .part {
+            margin-bottom: clamp(2.5rem, 6vw, 5rem);
+            padding: clamp(18px, 3vw, 30px);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            background: var(--panel-bg);
+            box-shadow: var(--card-shadow);
+        }
+
+        .part h2 {
+            margin: 0 0 1rem;
+            font-family: "Fraunces", Georgia, serif;
+            font-size: clamp(1.45rem, 2.6vw, 2.2rem);
+            letter-spacing: -0.03em;
+            text-align: center;
+        }
+
+        .part h3 {
+            margin: 1.2rem 0 0.35rem;
+            font-size: clamp(1.1rem, 1.8vw, 1.45rem);
+            color: #233551;
+        }
+
+        .part h4 {
+            margin: 1rem 0 0.4rem;
+            font-size: 1.08rem;
+            color: #2b405d;
+        }
+
+        p {
+            max-width: 76ch;
+            margin: 0.8rem auto 0;
+            text-align: left;
+            hyphens: none;
+            overflow-wrap: normal;
+        }
+
+        .list-tight {
+            max-width: 76ch;
+            margin: 0.8rem auto 0;
+            padding-left: 1.2rem;
+        }
+
+        .list-tight li {
+            margin-bottom: 0.35rem;
+        }
+
+        .note {
+            margin: 1rem auto 0;
+            max-width: 76ch;
+            padding: 12px 14px;
+            border-left: 4px solid var(--accent);
+            background: rgba(17, 87, 167, 0.08);
+            border-radius: 8px;
+        }
+
+        .formula-block {
+            margin: 1rem auto;
+            max-width: 76ch;
+            padding: 12px 14px;
+            border: 1px solid rgba(17, 87, 167, 0.15);
+            border-radius: 12px;
+            background: rgba(244, 247, 251, 0.9);
+            font-size: 0.97rem;
+            line-height: 1.7;
+            white-space: pre-wrap;
+        }
+
+        .formula-block .katex-display {
+            margin: 0.6rem 0;
+        }
+
+        .image-pair,
+        .gallery,
+        .triple-grid {
+            display: grid;
+            gap: 16px;
+            margin: 20px auto 10px;
+            max-width: 100%;
+        }
+
+        .image-pair {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .gallery {
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+        }
+
+        .triple-grid {
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        }
+
+        figure {
+            margin: 0;
+            border-radius: 14px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 14px 34px rgba(15, 23, 42, 0.08);
+        }
+
+        img {
+            display: block;
+            width: 100%;
+            height: auto;
+            object-fit: contain;
+            background: rgba(133, 156, 192, 0.08);
+        }
+
+        .gallery img,
+        .image-pair img,
+        .triple-grid img {
+            max-height: 380px;
+        }
+
+        .full-width-image {
+            width: min(100%, 880px);
+            margin: 20px auto 12px;
+        }
+
+        .velocity-original {
+            width: min(100%, 320px);
+            margin: 20px auto 12px;
+        }
+
+        .velocity-strips {
+            display: grid;
+            gap: 16px;
+            margin: 12px auto 10px;
+        }
+
+        .velocity-strips img {
+            max-height: none;
+        }
+
+        .hybrid-distant {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .hybrid-distant .distant-image-wrap {
+            min-height: 300px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .hybrid-distant img {
+            width: 64px;
+            height: 64px;
+            max-width: none;
+            object-fit: contain;
+            flex: 0 0 auto;
+        }
+
+        figcaption {
+            margin: 10px;
+            color: var(--muted);
+            font-size: 0.92rem;
+            text-align: center;
+        }
+
+        blockquote {
+            margin: 1rem auto 0;
+            max-width: 76ch;
+            padding: 12px 16px;
+            border-left: 4px solid var(--accent);
+            color: var(--text);
+            background: rgba(17, 87, 167, 0.06);
+            border-radius: 8px;
+        }
+
+        .katex {
+            font-size: 1.02em;
+        }
+
+        @media (max-width: 700px) {
+            .project-page {
+                padding: 20px 14px 72px;
+            }
+
+            .image-pair {
+                grid-template-columns: 1fr;
+            }
+
+            .part {
+                margin-bottom: 3.2rem;
+                border-radius: 16px;
+                padding: 16px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="../project-common.css">
+    <style>
+        /* Project 3: part filter and two-group table of contents */
+        .part-filter {
+            display: flex;
+            width: fit-content;
+            max-width: 100%;
+            margin: 0 auto 18px;
+            padding: 4px;
+            gap: 4px;
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.85);
+            box-shadow: 0 8px 22px rgba(15, 23, 42, 0.06);
+        }
+
+        .part-filter[hidden] {
+            display: none;
+        }
+
+        .part-filter-btn {
+            flex: 1 1 auto;
+            padding: 8px 20px;
+            border: 0;
+            border-radius: 999px;
+            background: transparent;
+            color: var(--muted);
+            font-family: "Manrope", "Segoe UI", Tahoma, sans-serif;
+            font-size: 0.92rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s ease, color 0.2s ease;
+        }
+
+        .part-filter-btn:hover {
+            color: var(--accent-2);
+            background: rgba(17, 87, 167, 0.08);
+        }
+
+        .part-filter-btn[aria-pressed="true"] {
+            color: #fff;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+        }
+
+        .part-filter-btn:focus-visible {
+            outline: 3px solid rgba(17, 87, 167, 0.5);
+            outline-offset: 2px;
+        }
+
+        .toc-groups {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        .toc-group {
+            padding: 14px 16px 12px;
+            border: 1px solid var(--border);
+            border-left: 3px solid rgba(17, 87, 167, 0.35);
+            border-radius: 14px;
+            background: rgba(17, 87, 167, 0.03);
+        }
+
+        .toc-group-title {
+            margin: 0 0 0.5rem;
+            font-family: "Fraunces", Georgia, serif;
+            font-size: 1.08rem;
+            line-height: 1.3;
+        }
+
+        .toc-group-title a {
+            color: var(--accent-2);
+            text-decoration: none;
+        }
+
+        .toc-outline,
+        .toc-outline ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .toc-outline > li {
+            margin-top: 0.6rem;
+            break-inside: avoid;
+        }
+
+        .toc-outline a {
+            color: var(--text);
+            text-decoration: none;
+        }
+
+        .toc-outline > li > a {
+            font-weight: 700;
+        }
+
+        .toc-outline ul {
+            margin: 0.2rem 0 0 0.35rem;
+            padding-left: 0.8rem;
+            border-left: 1px solid var(--border);
+        }
+
+        .toc-outline ul a {
+            display: inline-block;
+            padding: 1px 0;
+            color: var(--muted);
+            font-size: 0.92rem;
+            font-weight: 500;
+            line-height: 1.5;
+        }
+
+        .toc-outline ul ul a {
+            font-size: 0.88rem;
+        }
+
+        .toc-outline a:hover,
+        .toc-group-title a:hover {
+            color: var(--accent);
+        }
+
+        .toc-outline a:focus-visible,
+        .toc-group-title a:focus-visible {
+            outline: 2px solid rgba(17, 87, 167, 0.5);
+            outline-offset: 2px;
+            border-radius: 3px;
+        }
+
+        .project-page[data-view="a"] [data-part="b"],
+        .project-page[data-view="b"] [data-part="a"] {
+            display: none;
+        }
+
+        .project-page[data-view="a"] .toc-groups,
+        .project-page[data-view="b"] .toc-groups {
+            grid-template-columns: minmax(0, 1fr);
+        }
+
+        .project-page[data-view="a"] .toc-outline,
+        .project-page[data-view="b"] .toc-outline {
+            column-count: 2;
+            column-gap: 32px;
+        }
+
+        .project-page.is-switching [data-part] {
+            animation: part-fade 0.2s ease;
+        }
+
+        @keyframes part-fade {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 820px) {
+            .toc-groups,
+            .project-page[data-view="a"] .toc-outline,
+            .project-page[data-view="b"] .toc-outline {
+                grid-template-columns: minmax(0, 1fr);
+                column-count: 1;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .part-filter {
+                width: 100%;
+            }
+
+            .part-filter-btn {
+                padding: 8px 10px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .project-page.is-switching [data-part] {
+                animation: none;
+            }
+
+            .part-filter-btn {
+                transition: none;
+            }
+        }
+
+        /* Printing always includes both parts, regardless of the on-screen filter. */
+        @media print {
+            .part-filter {
+                display: none !important;
+            }
+
+            .project-page [data-part],
+            .project-page[data-view] [data-part] {
+                display: block !important;
+                animation: none !important;
+            }
+
+            .project-page .toc-groups,
+            .project-page[data-view] .toc-groups {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .project-page .toc-outline,
+            .project-page[data-view] .toc-outline {
+                column-count: 1;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="project-page">
+
+        <a class="back-link" href="../index.html">← Back to Portfolio</a>
+
+        <header class="project-title">
+            <h1>Project 3: Fun with Flow Models</h1>
+            <p class="subtitle">CS180: Introduction to Computer Vision and Computational Photography</p>
+            <p class="project-summary">Part A explores a pretrained PixNerd flow model for denoising, generation, editing, classifier-free guidance, visual anagrams, and hybrid images; Part B trains UNets from scratch on MNIST and extends them to time-conditioned and class-conditioned flow matching.</p>
+        </header>
+
+        <div class="part-filter" role="group" aria-label="Choose which report parts to show" hidden>
+            <button type="button" class="part-filter-btn" data-set-view="both" aria-pressed="true">Show Both</button>
+            <button type="button" class="part-filter-btn" data-set-view="a" aria-pressed="false">Part A</button>
+            <button type="button" class="part-filter-btn" data-set-view="b" aria-pressed="false">Part B</button>
+        </div>
+
+        <nav class="toc" aria-label="Table of contents">
+            <h3>Table of Contents</h3>
+            <div class="toc-groups">
+                <div class="toc-group" data-part="a">
+                    <h4 class="toc-group-title"><a href="#part-a">Part A: Exploring the Power of Flow Models</a></h4>
+                    <ul class="toc-outline">
+                        <li>
+                            <a href="#visualizing-training">1. Visualizing Training and Sampling</a>
+                            <ul>
+                                <li><a href="#section-1-1">1.1 Constructing Noisy Training Inputs</a></li>
+                                <li><a href="#section-1-2">1.2 Classical Denoising</a></li>
+                                <li><a href="#section-1-3">1.3 One-Step Denoising</a></li>
+                                <li><a href="#section-1-4">1.4 Visualizing Velocity</a></li>
+                                <li><a href="#section-1-5">1.5 Euler Sampling</a></li>
+                                <li><a href="#section-1-6">1.6 Generating Images from Noise</a></li>
+                            </ul>
+                        </li>
+                        <li>
+                            <a href="#cfg">2. Conditional Generation and Guidance</a>
+                            <ul>
+                                <li><a href="#section-2-1">2.1 Classifier-Free Guidance</a></li>
+                            </ul>
+                        </li>
+                        <li>
+                            <a href="#creative-applications">3. Creative Applications</a>
+                            <ul>
+                                <li><a href="#section-3-1">3.1 Image-to-Image Editing</a></li>
+                                <li><a href="#section-3-2">3.2 Text-Guided Image Editing</a></li>
+                                <li><a href="#section-3-3">3.3 Visual Anagrams</a></li>
+                                <li><a href="#section-3-4">3.4 Hybrid Images</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#summary">Part A Summary</a></li>
+                    </ul>
+                </div>
+
+                <div class="toc-group" data-part="b">
+                    <h4 class="toc-group-title"><a href="#part-b">Part B: Flow Matching from Scratch</a></h4>
+                    <ul class="toc-outline">
+                        <li>
+                            <a href="#part-b-section-1">1. Training a Single-Step Denoising UNet</a>
+                            <ul>
+                                <li><a href="#part-b-1-1">1.1 Implementing the UNet</a></li>
+                                <li>
+                                    <a href="#part-b-1-2">1.2 Using the UNet to Train a Denoiser</a>
+                                    <ul>
+                                        <li><a href="#part-b-1-2-1">1.2.1 Training</a></li>
+                                        <li><a href="#part-b-1-2-2">1.2.2 Out-of-Distribution Testing</a></li>
+                                        <li><a href="#part-b-1-2-3">1.2.3 Denoising Pure Noise</a></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            <a href="#part-b-section-2">2. Training a Flow Matching Model</a>
+                            <ul>
+                                <li><a href="#part-b-2-1">2.1 Adding Time Conditioning to UNet</a></li>
+                                <li><a href="#part-b-2-2">2.2 Training the Time-Conditioned UNet</a></li>
+                                <li><a href="#part-b-2-3">2.3 Sampling from the Time-Conditioned UNet</a></li>
+                                <li><a href="#part-b-2-4">2.4 Adding Class Conditioning to UNet</a></li>
+                                <li><a href="#part-b-2-5">2.5 Training the Class-Conditioned UNet</a></li>
+                                <li>
+                                    <a href="#part-b-2-6">2.6 Sampling from the Class-Conditioned UNet</a>
+                                    <ul>
+                                        <li><a href="#part-b-2-6-1">Learning-Rate Scheduler Comparison</a></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                        <li><a href="#part-b-summary">Part B Summary</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <div class="part-group" data-part="a">
+
+        <section id="part-a" class="part">
+            <h2>Part A: Exploring the Power of Flow Models</h2>
+
+            <p>In Part A, I explored a pretrained flow-matching model, <strong>PixNerd-XXL-P16-T2I</strong>, without training the model myself. The goal was to understand how flow models move between Gaussian noise and clean images, first through denoising and sampling, then through classifier-free guidance and several creative image-editing applications.</p>
+
+            <div class="formula-block">
+                \[
+                x_t = (1-t)\epsilon + t x_1
+                \]
+                where \(x_1\) is the clean image and \(\epsilon \sim \mathcal{N}(0, I)\) is Gaussian noise. The target velocity along this straight training path is
+                \[
+                v = x_1 - \epsilon.
+                \]
+            </div>
+
+            <p>For Sections 1.1–1.5, I used my own Iceland mountain photograph, center-cropped and resized to \(512\times512\), with seed 180 for reproducibility.</p>
+        </section>
+
+        <section id="visualizing-training" class="part">
+            <h2>1. Visualizing Training and Sampling</h2>
+
+            <h3 id="section-1-1">1.1 Constructing Noisy Training Inputs</h3>
+            <p>The first step was to implement the forward interpolation process. Given a clean image \(x_1\) and a single Gaussian noise tensor \(\epsilon\), I computed \(x_t=(1-t)\epsilon+t x_1\) for \(t=0.25, 0.50, 0.75\), reusing the same sampled noise tensor at all three times so that only \(t\) changed.</p>
+
+            <p>This is not simply additive noise: as \(t\) decreases, the clean-image contribution is also scaled down while the Gaussian-noise contribution increases. Thus \(t=0\) corresponds to pure noise and \(t=1\) corresponds to the clean image.</p>
+
+            <figure class="full-width-image">
+                <img src="./media/part_a/training_inputs.png" alt="Training inputs at t=0.25, 0.50, and 0.75">
+                <figcaption>Figure: noisy training inputs at \(t = 0.25\), \(0.50\), and \(0.75\) built from the same noise tensor.</figcaption>
+            </figure>
+
+            <p>The effect of \(t\) is clear: at \(t=0.25\), the Gaussian noise dominates and only a faint outline of the mountain remains; at \(t=0.50\), the main mountain structure is visible but still strongly corrupted; at \(t=0.75\), the clean-image component dominates and the mountain contours and color structure are already apparent.</p>
+
+            <h3 id="section-1-2">1.2 Classical Denoising with Gaussian Blur</h3>
+            <p>Before using the flow model, I tested a Gaussian-blur baseline. Since the clean-image component of \(x_t\) is scaled by \(t\), I divided the noisy image by \(t\) to restore its amplitude before applying blur. I selected the blur strength that minimized reconstruction MSE for each noise level: \(\sigma=16\) at \(t=0.25\), \(\sigma=4\) at \(t=0.50\), and \(\sigma=2\) at \(t=0.75\).</p>
+
+            <p><strong>At \(t=0.25\):</strong> the input is dominated by noise, so a very strong blur is needed. This suppresses much of the noise but removes most of the fine mountain structure, producing a heavily smoothed reconstruction.</p>
+            <p><strong>At \(t=0.50\):</strong> a moderate blur removes much of the noise and makes the mountain recognizable, but the snow texture and ridge boundaries are noticeably softened.</p>
+            <p><strong>At \(t=0.75\):</strong> only mild smoothing is required because the clean-image component is already strong, so substantially more structure and detail are preserved.</p>
+
+            <div class="triple-grid">
+                <figure>
+                    <img src="./media/part_a/blur_0.25.png" alt="Gaussian blur at t=0.25">
+                    <figcaption>\(t=0.25\)</figcaption>
+                </figure>
+                <figure>
+                    <img src="./media/part_a/blur_0.5.png" alt="Gaussian blur at t=0.50">
+                    <figcaption>\(t=0.50\)</figcaption>
+                </figure>
+                <figure>
+                    <img src="./media/part_a/blur_0.75.png" alt="Gaussian blur at t=0.75">
+                    <figcaption>\(t=0.75\)</figcaption>
+                </figure>
+            </div>
+
+            <p>This shows the tradeoff of classical filtering: stronger blur suppresses noise but also destroys useful high-frequency information. Compared to the learned flow model, Gaussian denoising cannot reconstruct semantically meaningful structure as effectively.</p>
+
+            <h3 id="section-1-3">1.3 One-Step Denoising</h3>
+            <p>Using the prompt <strong>"a high quality photo"</strong>, I evaluated the model once at \(x_t\) and extrapolated from the current time to the clean endpoint:</p>
+
+            <div class="formula-block">
+                \[
+                \hat{x}_1 = x_t + (1-t)\hat{v}_\theta(x_t, t, c).
+                \]
+            </div>
+
+            <p>Even at \(t=0.25\), where the input is heavily corrupted, the model reconstructs a plausible mountain rather than simply smoothing the noise. At \(t=0.50\), the snow fields and mountain geometry are recovered much more accurately; at \(t=0.75\), the output is already close to the original.</p>
+
+            <p>Unlike Gaussian filtering, the pretrained flow model can reconstruct plausible semantic structure rather than only averaging nearby pixels. This is especially visible in the mountain ridge and snow fields.</p>
+
+            <div class="triple-grid">
+                <figure>
+                    <img src="./media/part_a/one_step_0.25.png" alt="One-step denoising at t=0.25">
+                    <figcaption>One-step denoising at \(t=0.25\)</figcaption>
+                </figure>
+                <figure>
+                    <img src="./media/part_a/one_step_0.5.png" alt="One-step denoising at t=0.50">
+                    <figcaption>One-step denoising at \(t=0.50\)</figcaption>
+                </figure>
+                <figure>
+                    <img src="./media/part_a/one_step_0.75.png" alt="One-step denoising at t=0.75">
+                    <figcaption>One-step denoising at \(t=0.75\)</figcaption>
+                </figure>
+            </div>
+
+            <h3 id="section-1-4">1.4 Visualizing the Predicted Velocity</h3>
+            <p>To understand what the model is predicting, I visualized the update added at each noisy input. The model predicts a velocity field \(\hat{v}_t = v_\theta(x_t,t,c)\), so the update used for the one-step estimate is \((1-t)\hat{v}_t\). I also computed the ground-truth correction \((1-t)v_{\text{gt}} = x_1 - x_t\), where \(v_{\text{gt}} = x_1 - \epsilon\), and compared the predicted and true updates with an RMS error map.</p>
+
+            <figure class="velocity-original">
+                <img src="./media/part_a/velocity_original.png" alt="Original image for velocity visualization">
+                <figcaption>Original image</figcaption>
+            </figure>
+
+            <div class="velocity-strips">
+                <figure>
+                    <img src="./media/part_a/velocity_0.25.png" alt="Noisy image, predicted update, ground-truth update, and RMS error at t=0.25">
+                    <figcaption>\(t=0.25\): noisy input, predicted update, ground-truth update, and RMS error.</figcaption>
+                </figure>
+                <figure>
+                    <img src="./media/part_a/velocity_0.50.png" alt="Noisy image, predicted update, ground-truth update, and RMS error at t=0.50">
+                    <figcaption>\(t=0.50\): noisy input, predicted update, ground-truth update, and RMS error.</figcaption>
+                </figure>
+                <figure>
+                    <img src="./media/part_a/velocity_0.75.png" alt="Noisy image, predicted update, ground-truth update, and RMS error at t=0.75">
+                    <figcaption>\(t=0.75\): noisy input, predicted update, ground-truth update, and RMS error.</figcaption>
+                </figure>
+            </div>
+
+            <p>The predicted updates match the broad spatial structure of the true update, with the largest errors concentrated around ridges, edges, and textured snow regions. As \(t\) approaches 1, the required correction shrinks because the image is already close to the clean endpoint.</p>
+
+            <h3 id="section-1-5">1.5 Iterative Denoising with Euler Sampling</h3>
+            <p>A single velocity prediction assumes the velocity remains constant. In practice, the velocity field changes as the image changes, so I used Euler integration:</p>
+
+            <div class="formula-block">
+                \[
+                x_{t+h} = x_t + h\,v_\theta(x_t, t, c)
+                \]
+            </div>
+
+            <p>I used \(h=0.02\), starting from the saved \(t=0.50\) noisy image. This produces 25 updates before reaching \(t=1\). The saved trajectory shows the states at \(t=0.50\), \(0.60\), \(0.70\), \(0.80\), \(0.90\), and \(1.00\). Unlike one-step denoising, the Euler sampler recomputes the model's velocity after every update, allowing the predicted direction to change as the image evolves.</p>
+
+            <div class="full-width-image">
+                <figure>
+                    <img src="./media/part_a/trajectory.png" alt="Euler trajectory from t=0.5 to 1.0">
+                    <figcaption>Euler trajectory from noisy input to final reconstruction.</figcaption>
+                </figure>
+            </div>
+
+            <div class="full-width-image">
+                <figure>
+                    <img src="./media/part_a/comparison.png" alt="Comparison of Gaussian blur, one-step, and Euler denoising">
+                    <figcaption>Original vs. Gaussian blur vs. one-step vs. Euler.</figcaption>
+                </figure>
+            </div>
+
+            <div class="formula-block">
+                \[
+                \text{Gaussian blur}=0.01063,\quad
+                \text{One-step}=0.00345,\quad
+                \text{Euler}=0.00425.
+                \]
+            </div>
+
+            <p>For this image, the one-step estimate gives the lowest pixelwise MSE, but the Euler result retains more high-frequency mountain texture and sharper ridge structure. Visually, that can make the Euler output appear more natural even when the scalar MSE is slightly higher. Gaussian blur performs substantially worse because it cannot reconstruct the lost semantic structure.</p>
+
+            <h3 id="section-1-6">1.6 Generating Images from Pure Noise</h3>
+            <p>I also used Euler sampling from pure Gaussian noise at \(t=0\) to generate images directly. I created five samples using seeds 180–184 and the generic prompt <strong>"a high quality photo"</strong>.</p>
+
+            <figure class="full-width-image">
+                <img src="./media/part_a/conditional_samples.png" alt="Five unguided flow samples from Gaussian noise">
+                <figcaption>Five conditional samples from pure noise using the generic prompt.</figcaption>
+            </figure>
+
+            <p>A clear bias appeared: all five samples generated people or portraits. The generic text prompt favored portrait photography, even though the prompt itself was broad. The unguided outputs were not always equally coherent, but the underlying portrait bias was consistent.</p>
+        </section>
+
+        <section id="cfg" class="part">
+            <h2>2. Conditional Generation and Guidance</h2>
+
+            <h3 id="section-2-1">2.1 Classifier-Free Guidance</h3>
+            <p>To strengthen the text condition, I implemented classifier-free guidance (CFG). For each step, I evaluated the model once with the conditional text prompt and once with the empty string, then combined the two predictions:</p>
+
+            <div class="formula-block">
+                \[
+                v_{\text{CFG}} = v_c + w(v_c - v_u)
+                \]
+                with guidance weight \(w=7\) and the same Euler step size \(h=0.02\).
+            </div>
+
+            <p>I also verified that setting the CFG weight to \(w=0\) reproduces the ordinary conditional prediction.</p>
+
+            <p>Using the same initial noises as the unguided samples allowed a direct comparison. The CFG outputs were cleaner, more coherent, and more photographic, with faces better structured and the overall images more convincingly aligned with the prompt. However, stronger guidance also reduced diversity: the CFG results were more stylistically similar to each other.</p>
+
+            <div class="image-pair">
+                <figure>
+                    <img src="./media/part_a/conditional_samples.png" alt="Conditional sample grid without CFG">
+                    <figcaption>Conditional samples without CFG</figcaption>
+                </figure>
+                <figure>
+                    <img src="./media/part_a/cfg_samples.png" alt="CFG sample grid">
+                    <figcaption>CFG samples with guidance weight \(w=7\)</figcaption>
+                </figure>
+            </div>
+
+            <p>The underlying portrait bias of "a high quality photo" remained even under CFG; guidance strengthened this preferred interpretation rather than replacing it. This is a useful reminder that tuning the conditioning strength improves alignment but does not necessarily eliminate the model's underlying subject bias.</p>
+        </section>
+
+        <section id="creative-applications" class="part">
+            <h2>3. Creative Applications</h2>
+
+            <p>For the creative applications, I reused the Euler sampler with \(h=0.02\) and \(w=7\), using the empty string as the unconditional CFG prompt. The key idea was to modify the starting time, the text prompt, or the velocity field itself to steer the edit in different directions.</p>
+
+            <h3 id="section-3-1">3.1 Image-to-Image Editing</h3>
+            <p>Image-to-image editing begins by mixing an existing image with Gaussian noise at some starting time \(t_{\text{start}}\) and then running the guided flow sampler from that point to \(t=1\). I evaluated the same seven starting times throughout the editing sections:</p>
+
+            <div class="formula-block">
+                \[
+                t_{\text{start}} \in \{0.02, 0.04, 0.06, 0.10, 0.14, 0.25, 0.50\}.
+                \]
+            </div>
+
+            <p>A smaller starting time leaves very little of the source image intact and gives the model more freedom to invent new content. A larger starting time preserves more of the original image and therefore creates a smaller edit. This creates a continuum between free generation and preservation of the source image.</p>
+
+            <h4>Campanile</h4>
+            <p>Using a generic prompt of <strong>"a high quality photo"</strong>, the lowest starting times reinterpret the Campanile as a much simpler tower or monument. At very low starting times, mostly the concept of a tall vertical object survives and the model invents a new tower or monument. At intermediate times, the geometry increasingly follows the original Campanile proportions. At higher starting times, recognizable architectural details return and the result closely matches the source photograph.</p>
+            <figure class="full-width-image">
+                <img src="./media/part_a/edit_campanile.png" alt="Campanile image editing progression">
+                <figcaption>Campanile editing progression with varying starting times.</figcaption>
+            </figure>
+
+            <h4>Iceland Mountain</h4>
+            <p>The same trend appears with my Iceland photograph: lower starting times produce new snowy landscapes or abstract forms, while larger starting times steadily restore the original silhouette, snow fields, and sky. At very low starting times, the source mountain is largely replaced by unrelated or strongly reinterpreted snowy landscapes. At intermediate starting times, the broad mountain silhouette begins to return. At larger starting times, the original snow fields, ridge geometry, and sky are increasingly preserved.</p>
+            <figure class="full-width-image">
+                <img src="./media/part_a/edit_my_image_1.png" alt="Iceland mountain editing result">
+                <figcaption>Iceland mountain editing result.</figcaption>
+            </figure>
+
+            <h4>Tokyo Tower</h4>
+            <p>Low starting times can change both the object and the general scene, while larger starting times restore the recognizable red tower. At low starting times, both the tower and surrounding scene may change significantly. At intermediate values, the model preserves the vertical tower composition while changing its appearance. At higher starting times, the recognizable red Tokyo Tower structure is restored. These examples show the balance between generation and reconstruction.</p>
+            <figure class="full-width-image">
+                <img src="./media/part_a/edit_my_image_2.png" alt="Tokyo Tower editing result">
+                <figcaption>Tokyo Tower editing result.</figcaption>
+            </figure>
+
+            <h4>Marina Bay Sands</h4>
+            <p>At low starting times, the architecture is heavily reinterpreted and can turn into unrelated content. As the starting time increases, architectural forms begin returning, and at larger values the distinctive three-tower composition becomes recognizable again.</p>
+            <figure class="full-width-image">
+                <img src="./media/part_a/edit_web_image.png" alt="Marina Bay Sands editing result">
+                <figcaption>Marina Bay Sands.</figcaption>
+            </figure>
+
+            <h4>Bird Drawing</h4>
+            <p>The sparse line drawing gives the model little realistic texture to preserve. At low starting times, the sampler may produce unrelated natural-image content. At intermediate values, bird-like structures begin to emerge, while high starting times preserve the cartoon's original layout much more closely.</p>
+            <figure class="full-width-image">
+                <img src="./media/part_a/edit_drawing_1.png" alt="Bird drawing editing result">
+                <figcaption>Bird drawing.</figcaption>
+            </figure>
+
+            <h4>Line Drawing</h4>
+            <p>At low starting times, the sparse geometric objects are interpreted creatively as natural-image structures. As the starting time increases, the original arrangement and simple line-drawn forms progressively return.</p>
+            <figure class="full-width-image">
+                <img src="./media/part_a/edit_drawing_2.png" alt="Multi-object drawing editing result">
+                <figcaption>Line drawing.</figcaption>
+            </figure>
+
+            <h3 id="section-3-2">3.2 Text-Guided Image Editing</h3>
+            <p>I next changed the text prompt while keeping the same editing procedure. The prompt controlled the semantic direction of the edit, while \(t_{\text{start}}\) controlled how far the model could move away from the original image.</p>
+
+            <h4>Campanile → Rocket</h4>
+            <blockquote>"a photograph of a rocket on a launch pad"</blockquote>
+            <p>At low and intermediate starting times, the prompt strongly transforms the Campanile into a rocket or launch structure. The intermediate results are particularly interesting because they retain the Campanile's tall framing and proportions while replacing architectural details with rocket-like geometry. At larger starting times, the original Campanile increasingly dominates, and by \(t=0.50\) the tower is mostly preserved.</p>
+            <figure class="full-width-image">
+                <img src="./media/part_a/text_edit_campanile.png" alt="Campanile transformed into a rocket">
+                <figcaption>Campanile edited toward a rocket.</figcaption>
+            </figure>
+
+            <h4>Iceland Mountain → Erupting Volcano</h4>
+            <blockquote>"a photograph of an erupting volcano under a dramatic sky"</blockquote>
+            <p>At low and intermediate starting times, the snowy mountain becomes a volcanic cone with lava, smoke, or an eruption plume while still retaining the broad mountain composition. At larger starting times, the original snowy landscape increasingly returns and the volcanic transformation weakens. This illustrates the tradeoff between prompt strength and source-image preservation.</p>
+            <figure class="full-width-image">
+                <img src="./media/part_a/text_edit_my_image_1.png" alt="Iceland mountain transformed into an erupting volcano">
+                <figcaption>Iceland mountain transformed into an erupting volcano.</figcaption>
+            </figure>
+
+            <h4>Tokyo Tower → Eiffel Tower at Night</h4>
+            <blockquote>"a photograph of the Eiffel Tower at night with sparkling lights"</blockquote>
+            <p>At low and intermediate starting times, the model changes the tower toward an Eiffel-Tower-like lattice structure and introduces an illuminated night setting. At larger starting times, the original red Tokyo Tower and daytime scene increasingly return.</p>
+            <figure class="full-width-image">
+                <img src="./media/part_a/text_edit_my_image_2.png" alt="Tokyo Tower transformed into Eiffel Tower at night">
+                <figcaption>Tokyo Tower transformed toward the Eiffel Tower at night.</figcaption>
+            </figure>
+
+            <p>Overall, the text prompt controls the semantic direction of the transformation, while \(t_{\text{start}}\) controls how far the model is allowed to move away from the original image.</p>
+
+            <h3 id="section-3-3">3.3 Visual Anagrams</h3>
+            <p>Visual anagrams use two text conditions to create a single image whose interpretation changes under rotation. For the upright orientation, I computed a CFG velocity using prompt \(c_a\), rotated the current image by \(180^\circ\), computed another CFG velocity using prompt \(c_b\), rotated that velocity back, and averaged the two:</p>
+
+            <div class="formula-block">
+                \[
+                v_{\text{anagram}} = \frac{1}{2}\left[v_{\text{CFG}}(x_t,t,c_a) + F\left(v_{\text{CFG}}(F(x_t), t, c_b)\right)\right]
+                \]
+                where \(F\) denotes a \(180^\circ\) rotation.
+            </div>
+
+            <p>I first verified the implementation using the provided example prompt pairs. I then created two additional visual anagrams using prompt pairs of my own choice. The averaged velocity is used at every Euler step, encouraging the same image to satisfy two different text conditions depending on its orientation.</p>
+
+            <h4>Starter / Reference Examples</h4>
+            <h4>Anagram 1: Old Man / Campfire</h4>
+            <blockquote>Upright: "an oil painting of an old man"<br>Rotated: "an oil painting of people around a campfire"</blockquote>
+            <p>In the upright orientation, the result strongly resembles the face of an elderly man. After rotation by 180 degrees, the same warm highlights and dark masses reorganize into several figures surrounding a bright campfire. Some face-like structure remains visible after rotation, but both intended interpretations are recognizable.</p>
+            <figure class="full-width-image">
+                <img src="./media/part_a/anagram_views_0.png" alt="Old Man / Campfire visual anagram">
+                <figcaption>Old Man / Campfire visual anagram.</figcaption>
+            </figure>
+
+            <h4>Anagram 2: Snowy Village / Horse</h4>
+            <blockquote>Upright: "a lithograph of a snowy mountain village"<br>Rotated: "a lithograph of a horse"</blockquote>
+            <p>The upright image reads as a lightly sketched snowy mountain village. After rotation, the same lines and tonal structure form the body and outline of a horse. This illusion is more abstract than the first, but both intended interpretations remain visible.</p>
+            <figure class="full-width-image">
+                <img src="./media/part_a/anagram_views_1.png" alt="Snowy Village / Horse visual anagram">
+                <figcaption>Snowy Village / Horse visual anagram.</figcaption>
+            </figure>
+
+            <h4>My Custom Visual Anagrams</h4>
+            <p>After validating <code>visual_anagrams</code> with the reference examples above, I created two additional visual anagrams using prompt pairs of my own choice.</p>
+
+            <h4>Custom Anagram 1: Lion / Sailing Ship</h4>
+            <blockquote>Upright: "an oil painting of a lion"<br>Rotated 180°: "an oil painting of a sailing ship"</blockquote>
+            <p>In the upright orientation, the result clearly reads as the face of a lion. The eyes, nose, muzzle, and mane provide a strong central facial structure.</p>
+            <p>After rotating the same image by \(180^\circ\), many of those features take on a second interpretation. The large brown and cream regions become the hull and sails of a ship, while the surrounding blue-green region forms the sea and background. The upper portion also develops recognizable masts and sails.</p>
+            <p>Some lion-like facial structure remains visible in the rotated interpretation, but the sailing ship is still clearly recognizable. This overlap illustrates the main challenge of visual anagrams: the same spatial structures must simultaneously contribute to two different semantic interpretations.</p>
+            <figure class="full-width-image">
+                <img src="./media/part_a/anagram_custom_views_0.png" alt="Custom Lion / Sailing Ship visual anagram shown upright and rotated 180 degrees">
+                <figcaption>Lion / Sailing Ship custom visual anagram, shown upright and rotated.</figcaption>
+            </figure>
+
+            <h4>Custom Anagram 2: Castle / Butterfly</h4>
+            <blockquote>Upright: "a watercolor painting of a castle"<br>Rotated 180°: "a watercolor painting of a butterfly"</blockquote>
+            <p>In the upright orientation, the central blue forms read as a watercolor castle. Multiple pointed towers and spires create a recognizable castle skyline, while the pale blue and green color palette gives the image a soft watercolor appearance.</p>
+            <p>When the image is rotated by \(180^\circ\), the same approximately symmetric structure becomes a butterfly. The castle towers are reinterpreted as parts of the butterfly's wings, while the darker central region becomes its body. Thin lines extending from the structure also contribute to the appearance of antennae.</p>
+            <p>Because both the castle and butterfly have strong bilateral structure, the two concepts fit together especially naturally. Of my custom visual anagrams, this produced the cleanest separation between the two intended interpretations.</p>
+            <figure class="full-width-image">
+                <img src="./media/part_a/anagram_custom_views_1.png" alt="Custom Castle / Butterfly visual anagram shown upright and rotated 180 degrees">
+                <figcaption>Castle / Butterfly custom visual anagram, shown upright and rotated.</figcaption>
+            </figure>
+
+            <h4>Custom Visual-Anagram Observation</h4>
+            <p>These custom experiments reinforced that prompt selection matters substantially for visual anagrams. Pairs with compatible global structure can share image features more effectively. The castle and butterfly, for example, both benefit from approximate bilateral symmetry, while the lion and sailing ship require the model to reuse more complex local structures in different ways.</p>
+            <p>The technique therefore does not simply place two images on top of each other. Instead, the averaged velocity field encourages a single generated image whose features remain semantically useful under two orientations.</p>
+
+            <h3 id="section-3-4">3.4 Hybrid Images</h3>
+            <p>Finally, I created hybrid images by combining low-frequency information from one velocity field with high-frequency information from another. The hybrid velocity was formed as</p>
+
+            <div class="formula-block">
+                \[
+                v_{\text{hybrid}} = \operatorname{lowpass}(v_a) + \left[v_b - \operatorname{lowpass}(v_b)\right].
+                \]
+            </div>
+
+            <p>The low-pass component determines large-scale structure visible from a distance, while the high-frequency component determines fine details perceived close up. For the low-pass filter, I used Gaussian blur with \(\sigma = 16\) and a kernel size of 265 at \(512\times512\).</p>
+            <p>After validating <code>make_hybrids</code> using the provided example prompt pairs, I created two additional hybrid images using prompts of my own choice. The first prompt controls the low-frequency structure, which becomes more important when the image is viewed from a distance or reduced in size. The second prompt controls the high-frequency structure, which dominates at full resolution.</p>
+            <p>For the website, each distant version is displayed at its actual \(64\times64\) size rather than stretched back to \(512\times512\), making the change in perception from suppressing high-frequency detail easier to see.</p>
+
+            <h4>Starter / Reference Examples</h4>
+            <h4>Hybrid 1: Skull / Waterfall</h4>
+            <blockquote>Distant / low-frequency prompt:<br>"a lithograph of a skull"<br><br>Close / high-frequency prompt:<br>"a lithograph of a waterfall"</blockquote>
+            <div class="image-pair">
+                <figure>
+                    <img src="./media/part_a/hybrid_0.png" alt="Hybrid skull/waterfall close view">
+                    <figcaption>Close/full-resolution view</figcaption>
+                </figure>
+                <figure class="hybrid-distant">
+                    <div class="distant-image-wrap">
+                        <img src="./media/part_a/hybrid_0_distant.png" alt="Hybrid skull/waterfall distant view">
+                    </div>
+                    <figcaption>Distant view — displayed at 64 × 64</figcaption>
+                </figure>
+            </div>
+
+            <p>At full resolution, the image reads primarily as a waterfall; when reduced in size or viewed from farther away, the high-frequency waterfall details disappear and the broad dark/light regions form a skull-like silhouette.</p>
+
+            <h4>Hybrid 2: Cat / Forest</h4>
+            <blockquote>Distant / low-frequency prompt:<br>"a lithograph of a cat"<br><br>Close / high-frequency prompt:<br>"a lithograph of a forest"</blockquote>
+            <div class="image-pair">
+                <figure>
+                    <img src="./media/part_a/hybrid_1.png" alt="Hybrid cat/forest close view">
+                    <figcaption>Close/full-resolution view</figcaption>
+                </figure>
+                <figure class="hybrid-distant">
+                    <div class="distant-image-wrap">
+                        <img src="./media/part_a/hybrid_1_distant.png" alt="Hybrid cat/forest distant view">
+                    </div>
+                    <figcaption>Distant view — displayed at 64 × 64</figcaption>
+                </figure>
+            </div>
+
+            <p>At full resolution, the image reads as a forest of tree-like details; when reduced, the fine details disappear and the large-scale structure forms a cat-like silhouette.</p>
+
+            <h4>My Custom Hybrid Images</h4>
+            <p>These examples retain the same frequency-based construction while using two new prompt pairs chosen for this project.</p>
+
+            <h4>Custom Hybrid 1: Owl Face / Dense Tree Branches</h4>
+            <blockquote>Distant / low-frequency prompt:<br>"a lithograph of an owl face"<br><br>Close / high-frequency prompt:<br>"a lithograph of dense tree branches"</blockquote>
+            <div class="image-pair">
+                <figure>
+                    <img src="./media/part_a/hybrid_custom_0.png" alt="Custom owl face and dense tree branches hybrid at full resolution">
+                    <figcaption>Close/full-resolution view — dense tree branches.</figcaption>
+                </figure>
+                <figure class="hybrid-distant">
+                    <div class="distant-image-wrap">
+                        <img src="./media/part_a/hybrid_custom_0_distant.png" alt="Custom owl face and dense tree branches hybrid at 64 by 64">
+                    </div>
+                    <figcaption>Distant / low-frequency view — Owl Face (64 × 64)</figcaption>
+                </figure>
+            </div>
+            <p>At full resolution, the image is dominated by a dense black-and-white branching pattern. Individual trunks, branches, and fine branching structures are visually prominent, so the close interpretation reads primarily as a network of tree branches.</p>
+            <p>When the image is reduced to \(64\times64\), much of this high-frequency branching detail disappears. The remaining large-scale arrangement is much more symmetric: the dark regions on the left and right form eye-like areas, while the central trunk produces a strong vertical structure through the middle. Together, these low-frequency shapes suggest the intended owl-like face.</p>
+            <p>This example shows the frequency-separation idea clearly: the same fine structures that appear as individual branches at full resolution merge into larger facial regions when viewed from farther away.</p>
+
+            <h4>Custom Hybrid 2: Human Face / Field of Flowers</h4>
+            <blockquote>Distant / low-frequency prompt:<br>"a lithograph of a human face"<br><br>Close / high-frequency prompt:<br>"a lithograph of a field of flowers"</blockquote>
+            <div class="image-pair">
+                <figure>
+                    <img src="./media/part_a/hybrid_custom_1.png" alt="Custom human face and field of flowers hybrid at full resolution">
+                    <figcaption>Close/full-resolution view — field of flowers.</figcaption>
+                </figure>
+                <figure class="hybrid-distant">
+                    <div class="distant-image-wrap">
+                        <img src="./media/part_a/hybrid_custom_1_distant.png" alt="Custom human face and field of flowers hybrid at 64 by 64">
+                    </div>
+                    <figcaption>Distant / low-frequency view — Human Face (64 × 64)</figcaption>
+                </figure>
+            </div>
+            <p>At full resolution, the high-frequency component dominates. The result contains clearly recognizable flowers, petals, stems, and foliage arranged into a black-and-white botanical composition.</p>
+            <p>When the image is reduced to \(64\times64\), the individual petals and small plant details become much less visible. What remains is the broader distribution of dark and light regions. These large-scale regions form a more compact face-like silhouette rather than reading as individual flowers.</p>
+            <p>Compared with viewing the image at full resolution, the distant version therefore emphasizes an entirely different level of structure: local botanical details are suppressed while the low-frequency facial composition becomes more prominent.</p>
+
+            <h4>Custom Hybrid-Image Observation</h4>
+            <p>The custom hybrid experiments also showed that prompt selection is important. The close prompt benefits from subjects with substantial fine detail—such as branches, flowers, or other textured structures—because those details can dominate the high-frequency component.</p>
+            <p>In contrast, the distant prompt works best when its identity can be represented using broad shapes and tonal regions. Once the image is downsampled, small details disappear, so only these low-frequency structures remain.</p>
+            <p>The results demonstrate that the two interpretations are not simply blended with transparency. Instead, they occupy different <strong>spatial-frequency bands</strong> of the same generated image.</p>
+        </section>
+
+        <section id="summary" class="part">
+            <h2>Part A Summary</h2>
+            <p>Part A showed several different ways of using the same pretrained flow model. The early experiments demonstrated how a flow model predicts a direction from noisy images toward the clean-data distribution and how repeated Euler updates can be used for reconstruction and generation. Compared with classical Gaussian filtering, the learned model reconstructs semantically meaningful image structure instead of simply suppressing high-frequency content.</p>
+
+            <p>Sampling from pure noise also revealed a strong subject bias in the pretrained text-to-image model: the generic prompt <strong>"a high quality photo"</strong> consistently produced portraits in my experiment. Classifier-free guidance improved the coherence and photographic quality of the outputs, although it reduced diversity and strengthened the underlying bias rather than removing it.</p>
+
+            <p>The creative applications then showed that the predicted flow field can be manipulated in several ways. Adjusting the starting time creates a continuum between free generation and source-image preservation; changing the text prompt steers an image toward a desired semantic edit; averaging transformed velocity fields produces orientation-dependent visual anagrams; and separating low- and high-frequency velocity components produces hybrid images whose interpretation changes with viewing distance. After validating the creative methods with the provided example prompts, I also produced two visual anagrams and two hybrid images using my own prompt pairs, highlighting how strongly illusion quality depends on the structural compatibility of the chosen concepts.</p>
+
+            <p>Overall, these experiments demonstrate that flow matching is useful not only for generating images from noise, but also as a flexible framework for controlled image manipulation.</p>
+        </section>
+
+        </div>
+
+        <div class="part-group" data-part="b">
+
+        <section id="part-b" class="part">
+            <h2>Part B: Flow Matching from Scratch</h2>
+
+            <p>In Part B, I built and trained my own UNet-based generative models on MNIST. I first used the UNet as a single-step denoiser, then tested the limitations of one-step denoising from pure Gaussian noise. I then moved to flow matching, where the model learns a velocity field that continuously transforms noise into valid digits, and finally extended the model with time and class conditioning.</p>
+
+            <h3 id="part-b-section-1">1. Training a Single-Step Denoising UNet</h3>
+
+            <h4 id="part-b-1-1">1.1 Implementing the UNet</h4>
+            <p>I first implemented the UNet architecture used throughout Part B. The encoder progressively reduces spatial resolution while increasing feature channels, and the decoder upsamples while concatenating latent activations from the encoder through skip connections. The basic operations were a 3×3 convolution with batch normalization and GELU, downsampling via strided convolution, upsampling via transposed convolution, average pooling to a 1×1 bottleneck, and a symmetric decoder to return the image to its original shape.</p>
+
+            <ul class="list-tight">
+                <li><strong>Conv:</strong> 3×3 convolution, stride 1, padding 1, followed by BatchNorm2d and GELU. It changes channels while preserving spatial resolution.</li>
+                <li><strong>DownConv:</strong> 3×3 convolution, stride 2, padding 1, followed by BatchNorm2d and GELU. It halves spatial resolution.</li>
+                <li><strong>UpConv:</strong> 4×4 transposed convolution, stride 2, padding 1, followed by BatchNorm2d and GELU. It doubles spatial resolution.</li>
+                <li><strong>Flatten:</strong> 7×7 average pooling that maps a 7×7 feature map to 1×1.</li>
+                <li><strong>Unflatten:</strong> transposed convolution that maps the 1×1 bottleneck back to 7×7.</li>
+                <li><strong>ConvBlock:</strong> two Conv operations.</li>
+                <li><strong>DownBlock:</strong> DownConv followed by ConvBlock.</li>
+                <li><strong>UpBlock:</strong> UpConv followed by ConvBlock.</li>
+            </ul>
+
+            <div class="formula-block">
+                \[
+                1\times28\times28
+                \rightarrow
+                D\times28\times28
+                \rightarrow
+                D\times14\times14
+                \rightarrow
+                2D\times7\times7
+                \rightarrow
+                2D\times1\times1,
+                \]
+                and then
+                \[
+                2D\times1\times1
+                \rightarrow
+                2D\times7\times7
+                \rightarrow
+                D\times14\times14
+                \rightarrow
+                D\times28\times28
+                \rightarrow
+                1\times28\times28.
+                \]
+            </div>
+
+            <p>With hidden dimension \(D=128\), the implementation contained approximately 7.89 million trainable parameters. This architecture is the implementation requirement for the rest of the report, and no separate generated image is required for the network itself.</p>
+
+            <h4 id="part-b-1-2">1.2 Using the UNet to Train a Denoiser</h4>
+            <p>The first task was to use the UNet as a conventional denoiser. Given a clean image \(x\), I generated a noisy version</p>
+
+            <div class="formula-block">
+                \[
+                z = x + \sigma\epsilon,\qquad \epsilon\sim\mathcal N(0,I).
+                \]
+            </div>
+
+            <p>The denoiser \(D_\theta\) was trained to map the noisy image back to the corresponding clean image by minimizing mean-squared error:</p>
+
+            <div class="formula-block">
+                \[
+                \mathcal L = \mathbb E_{x,\epsilon}\left[\|D_\theta(z)-x\|^2\right].
+                \]
+            </div>
+
+            <p>The MNIST pixel values were normalized to \([0,1]\), so the noise scale can be interpreted relative to that image range. I used \(\sigma\in\{0.0,0.2,0.4,0.5,0.6,0.8,1.0\}\) with the same digit and noise realization to visualize the effect of increasing corruption. At \(\sigma=0\), the digit is unchanged; around \(0.4\)–\(0.5\), the digit remains legible but heavily corrupted; by \(0.8\) and \(1.0\), the noise becomes comparable to or stronger than the digit itself.</p>
+
+            <figure class="full-width-image">
+                <img src="./media/part_b/noising_process.png" alt="MNIST digit under increasing Gaussian noise levels">
+                <figcaption>Digit corruption under increasing Gaussian noise levels.</figcaption>
+            </figure>
+
+            <h4 id="part-b-1-2-1">1.2.1 Training</h4>
+            <p>I trained a fresh UNet with hidden dimension \(D=128\), batch size 256, Gaussian noise level \(\sigma=0.5\), Adam learning rate \(10^{-4}\), and 5 training epochs. I trained only on the shuffled MNIST training split and kept the test split separate for evaluation. Critically, I generated fresh Gaussian noise for each training batch instead of fixing a single noisy version of each image, improving the model's robustness.</p>
+
+            <figure class="full-width-image">
+                <img src="./media/part_b/denoiser_training_curve.png" alt="Denoiser training loss curve">
+                <figcaption>Training loss curve for the single-step denoising UNet.</figcaption>
+            </figure>
+
+            <p>The loss decreases quickly at first and then slowly refines, which is consistent with the straightforward nature of the regression problem. The initial loss was approximately 0.215; the model converged to a much smaller MSE by the end of training.</p>
+
+            <p>The four rows show the noisy inputs, outputs after epoch 1, outputs after epoch 5, and the clean targets. The displayed examples are held-out MNIST test-set images corrupted at Sigma = 0.5.</p>
+
+            <figure class="full-width-image">
+                <img src="./media/part_b/denoiser_epoch_1_vs_5.png" alt="Denoiser outputs after epoch 1 and epoch 5">
+                <figcaption>Epoch 1 vs. epoch 5 denoising on the same noisy inputs at \(\sigma=0.5\).</figcaption>
+            </figure>
+
+            <p>Even after one epoch, the model removes most of the Gaussian noise and recovers recognizable digit shapes. After five epochs, the outputs are cleaner and more faithful, with smoother backgrounds and more stable strokes. The large initial improvement from noisy input to epoch 1 output is stronger than the later improvement from epoch 1 to epoch 5, matching the rapidly flattening training-loss curve.</p>
+
+            <h4 id="part-b-1-2-2">1.2.2 Out-of-Distribution Testing</h4>
+            <p>The denoiser was trained only with \(\sigma=0.5\), so I next tested generalization to other noise levels. Using the same held-out test digit and the same noise realization, I evaluated \(\sigma = 0.0, 0.2, 0.4, 0.5, 0.6, 0.8, 1.0\). Near the training distribution, the model recovers a clear digit; at \(\sigma=0\), it slightly smooths the already-clean image; at \(\sigma=0.8\) and especially \(1.0\), the output begins to show distortions and additional structures, indicating a distribution shift away from the trained noise regime.</p>
+
+            <figure class="full-width-image">
+                <img src="./media/part_b/ood_denoising.png" alt="Out-of-distribution denoising results across several noise levels">
+                <figcaption>Out-of-distribution denoising performance at several noise levels.</figcaption>
+            </figure>
+
+            <p>This shows that a denoiser trained for one fixed corruption level learns a specialized mapping rather than a universal denoising function. It generalizes reasonably to nearby noise levels but degrades as the test corruption moves farther away from the training distribution.</p>
+
+            <h4 id="part-b-1-2-3">1.2.3 Denoising Pure Noise</h4>
+            <p>The next experiment asked whether the same one-step denoising setup could be turned into a generative model. Instead of corrupting a clean image, I trained a fresh \(D=128\) UNet using entirely independent Gaussian inputs \(\epsilon\sim\mathcal N(0,I)\) while the target remained a random clean MNIST digit. This is a strictly more difficult problem because the input contains no information about which class the target should be.</p>
+
+            <figure class="full-width-image">
+                <img src="./media/part_b/pure_denoiser_training_curve.png" alt="Training loss when denoising pure Gaussian noise">
+                <figcaption>Training loss for the pure-noise denoising experiment.</figcaption>
+            </figure>
+
+            <p>The pure-noise model begins at a relatively high MSE of about 0.22, then drops rapidly toward about 0.07 before plateauing. This plateau happens because the network has no information about which target digit to predict from the independent Gaussian input. Under squared-error loss, the optimal deterministic prediction is the average or centroid of the training distribution rather than a specific valid digit.</p>
+
+            <figure class="full-width-image">
+                <img src="./media/part_b/pure_denoiser_epoch_1_vs_5.png" alt="Pure-noise denoiser outputs after epoch 1 and epoch 5">
+                <figcaption>Outputs from the pure-noise denoising model after epochs 1 and 5.</figcaption>
+            </figure>
+
+            <p>Different Gaussian noise inputs therefore produce nearly the same blurry digit-like template. The resulting template is therefore related to the MNIST training digits collectively rather than to any single training image or digit class: it resembles a pixelwise compromise among many possible targets. This makes it clear that one-step MSE denoising is not enough for unconditional generation: a generative model needs a mechanism that preserves information about the current noise sample and evolves it gradually toward a valid output. That motivates flow matching.</p>
+
+            <h3 id="part-b-section-2">2. Training a Flow Matching Model</h3>
+            <p>Instead of trying to map pure noise directly to a clean image in one step, I trained the UNet to predict a velocity field that moves a sample toward the data distribution along a continuous path. For a clean MNIST image \(x_1\) and Gaussian noise \(x_0\sim\mathcal N(0,I)\), I defined</p>
+
+            <div class="formula-block">
+                \[
+                x_t = (1-t)x_0 + t x_1,
+                \qquad
+t\in[0,1],
+                \]
+                and the velocity is
+                \[
+                u(x_t,t) = \frac{d x_t}{dt} = x_1 - x_0.
+                \]
+            </div>
+
+            <p>The network was trained to approximate this velocity field using the flow-matching objective</p>
+
+            <div class="formula-block">
+                \[
+                \mathcal L = \mathbb E\left[\| (x_1-x_0) - u_\theta(x_t,t)\|^2\right].
+                \]
+            </div>
+
+            <h4 id="part-b-2-1">2.1 Adding Time Conditioning to UNet</h4>
+            <p>The flow depends on both the current image and the current time \(t\), so I extended the UNet with time conditioning. I implemented an FCBlock with a linear layer, GELU, and a second linear layer, and used two separate time embeddings to modulate feature maps in the decoder. The key idea is that the same image structure can require a very different update near \(t=0\) than near \(t=1\). The encoder, decoder, and skip connections remained the same as in the unconditional architecture.</p>
+
+            <div class="formula-block">
+                \[
+                t_1 = \mathrm{FCBlock}_1(t),
+                \qquad
+                t_2 = \mathrm{FCBlock}_2(t)
+                \]
+                and then
+                \[
+                \text{unflatten} \leftarrow \text{unflatten}\odot t_1,
+                \qquad
+                \text{up}_1 \leftarrow \text{up}_1\odot t_2.
+                \]
+            </div>
+
+            <p>The time embedding therefore modulates decoder features at two different resolutions. This keeps the model aware of where it is along the noise-to-data trajectory.</p>
+
+            <h4 id="part-b-2-2">2.2 Training the Time-Conditioned UNet</h4>
+            <p>I trained a time-conditioned model using hidden dimension \(D=64\), batch size 64, 10 epochs, Adam, initial learning rate \(10^{-2}\), and 50 discrete flow timesteps. I sampled a fresh Gaussian noise image and a random normalized timestep for each training image, constructed \(x_t=(1-t)x_0+t x_1\), and trained the network to predict \(x_1-x_0\). The model was trained on the shuffled MNIST training split, with fresh noise and timesteps generated whenever batches were fetched. I also used an exponential learning-rate scheduler with \(\gamma = 0.1^{1/10}\), and \(\texttt{scheduler.step()}\) was called once after each epoch, reducing the learning rate from 0.01 to approximately 0.001 by the end of training.</p>
+
+            <figure class="full-width-image">
+                <img src="./media/part_b/time_conditioned_training_curve.png" alt="Training loss for time-conditioned flow matching model">
+                <figcaption>Training loss for the time-conditioned flow-matching model.</figcaption>
+            </figure>
+
+            <p>The average loss decreased from 0.153667 after epoch 1 to 0.092857 after epoch 5 and 0.087075 after epoch 10. The curve shows a large initial drop followed by slower refinement, which is exactly what we expect from progressively learning the velocity field.</p>
+
+            <h4 id="part-b-2-3">2.3 Sampling from the Time-Conditioned UNet</h4>
+            <p>To generate samples, I began from \(x_0\sim\mathcal N(0,I)\) and integrated the predicted velocity using Euler updates with \(T=50\) steps:</p>
+
+            <div class="formula-block">
+                \[
+                \Delta t = \frac{1}{T},\qquad
+                x_{t+\Delta t}=x_t+\Delta t\,u_\theta(x_t,t).
+                \]
+            </div>
+
+            <p>I sampled 64 images using the same initial noise batch, generated from the same seed, for the epoch 1, 5, and 10 checkpoints so that differences in output quality could be attributed to training rather than different random initializations. After one epoch, the outputs already resemble handwritten digits but are fragmented and ambiguous. By epoch 5, most samples are interpretable as valid digits, and by epoch 10, the samples are more stable and recognizable, though still diverse because the model is only conditioned on time and not class.</p>
+
+            <figure class="full-width-image">
+                <img src="./media/part_b/time_conditioned_samples.png" alt="Generated samples from the time-conditioned model at epochs 1, 5, and 10">
+                <figcaption>Samples from the time-conditioned flow model at epochs 1, 5, and 10.</figcaption>
+            </figure>
+
+            <h4 id="part-b-2-4">2.4 Adding Class Conditioning to UNet</h4>
+            <p>The time-only model generated recognizable digits but with uncontrolled class. I therefore extended the model with class conditioning. The integer label \(c\in\{0,\ldots,9\}\) was converted to a one-hot vector of length 10, and two FCBlocks transformed this vector into the learned conditioning embeddings that modulated the decoder features alongside the time embeddings. The resulting modulation was</p>
+
+            <div class="formula-block">
+                \[
+                \text{unflatten} = c_1\odot\text{unflatten} + t_1,
+                \qquad
+                \text{up}_1 = c_2\odot\text{up}_1 + t_2.
+                \]
+            </div>
+
+            <p>This means the time embedding indicates where along the flow path a sample sits, while the class embedding indicates which digit the flow should move toward. I also dropped the class condition with probability 0.1 during training to support unconditional prediction and classifier-free guidance at sampling time.</p>
+
+            <h4 id="part-b-2-5">2.5 Training the Class-Conditioned UNet</h4>
+            <p>I trained a fresh class-conditioned model using hidden dimension \(D=64\), batch size 64, 10 epochs, 300 discrete timesteps, class dropout probability 0.1, Adam with initial learning rate \(10^{-2}\), and the same exponential scheduler \(\gamma=0.1^{1/10}\). This fresh model was also trained on the shuffled MNIST training split. The flow-matching objective was otherwise unchanged:</p>
+
+            <div class="formula-block">
+                \[
+                x_t = (1-t)x_0 + tx_1,
+                \qquad
+                u_{\text{target}} = x_1-x_0.
+                \]
+            </div>
+
+            <figure class="full-width-image">
+                <img src="./media/part_b/class_conditioned_training_curve.png" alt="Training curve of the class-conditioned flow model">
+                <figcaption>Training loss for the class-conditioned flow model.</figcaption>
+            </figure>
+
+            <p>The average losses were Epoch 1 = 0.157855, Epoch 5 = 0.091528, and Epoch 10 = 0.083372. This final training loss is slightly lower than the time-only model's final loss of 0.087075, and the more important practical advantage is explicit class control during generation.</p>
+
+            <h4 id="part-b-2-6">2.6 Sampling from the Class-Conditioned UNet</h4>
+            <p>For class-conditioned generation, I used classifier-free guidance. At each step, the model was evaluated twice: once with the chosen class condition and once with the class removed, giving \(u_c\) and \(u_u\). I then combined them as</p>
+
+            <div class="formula-block">
+                \[
+                u_{\text{CFG}} = u_u + \gamma(u_c-u_u),\qquad \gamma=5.0.
+                \]
+            </div>
+
+            <p>I used 300 sampling steps and generated four samples for each digit class 0 through 9 at epochs 1, 5, and 10. At epoch 1, the outputs already show class-specific structure, but many digits are distorted or incomplete. By epoch 5, the digits become much more consistent, and by epoch 10, the model reliably generates clean, recognizable digits for each requested class while still retaining some variation in handwriting style.</p>
+
+            <figure class="full-width-image">
+                <img src="./media/part_b/class_conditioned_samples.png" alt="Samples generated by the class-conditioned flow model">
+                <figcaption>Class-conditioned samples for digits 0–9 at epochs 1, 5, and 10, with four samples per class.</figcaption>
+            </figure>
+
+            <h4 id="part-b-2-6-1">Learning-Rate Scheduler Comparison</h4>
+            <p>The final experiment tested whether similar performance could be achieved without the exponential learning-rate scheduler. The scheduler-based run began at \(10^{-2}\) and decayed toward roughly \(10^{-3}\), while the no-scheduler run used a smaller fixed learning rate of 0.003 to compensate. The final training losses were</p>
+
+            <div class="formula-block">
+                \[
+                \text{with scheduler}=0.083372,\qquad
+                \text{without scheduler}=0.086523.
+                \]
+            </div>
+
+            <p>The scheduler-based model reached a slightly lower final loss, but the visual generation quality remains very similar. Both models generate clear instances of all ten requested digit classes, with only marginal differences in a few individual strokes. This indicates that the scheduler is useful for fine convergence but not strictly required when a smaller constant learning rate is used.</p>
+
+            <figure class="full-width-image">
+                <img src="./media/part_b/class_conditioned_scheduler_comparison.png" alt="Comparison between scheduled and fixed learning-rate class-conditioned models">
+                <figcaption>Comparison of the scheduled and constant-learning-rate class-conditioned models.</figcaption>
+            </figure>
+
+            <h3 id="part-b-summary">Part B Summary</h3>
+            <p>Part B demonstrated why generative modeling requires more than learning a direct regression from noise to data. The conventional denoising UNet worked well when the noisy input retained information about the underlying MNIST digit. At \(\sigma=0.5\), the model learned to remove strong Gaussian corruption and generalized reasonably well to nearby noise levels, but its performance degraded as the test noise moved farther away from the training distribution.</p>
+
+            <p>When the input was changed to completely independent Gaussian noise, the limitations of one-step MSE regression became clear. Because the input contains no information about the desired target class, the model converges toward a blurry average or centroid of the training distribution rather than producing diverse digits. Flow matching solves this by learning a velocity field rather than a one-step mapping: the time-conditioned model progressively moves each random initial noise sample through intermediate states toward the MNIST distribution, allowing different initial noises to evolve into different outputs.</p>
+
+            <p>Adding class conditioning makes the generative process substantially more controllable. By providing a one-hot digit label, the model learns a class-specific flow, while 10% conditioning dropout enables classifier-free guidance during sampling. With guidance scale 5, the final model reliably generates several distinct samples for each requested digit class. Finally, the learning-rate scheduler experiment showed that comparable generation quality can be achieved without exponential decay by replacing it with a smaller fixed learning rate of 0.003; the scheduled model reached a slightly lower final training loss, but both models produced visually comparable MNIST samples.</p>
+
+            <p>Overall, Part B progresses from single-step reconstruction to iterative generative modeling, showing why flow matching and conditioning provide both diversity and control when generating images from Gaussian noise.</p>
+        </section>
+
+        </div>
+
+    </div>
+
+    <script>
+        (function () {
+            var page = document.querySelector(".project-page");
+            var bar = document.querySelector(".part-filter");
+            if (!page || !bar) { return; }
+
+            var buttons = bar.querySelectorAll("[data-set-view]");
+            var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+            var timer;
+
+            function setView(view, animate) {
+                page.setAttribute("data-view", view);
+                buttons.forEach(function (btn) {
+                    btn.setAttribute("aria-pressed", String(btn.getAttribute("data-set-view") === view));
+                });
+                if (animate && !reduceMotion) {
+                    page.classList.remove("is-switching");
+                    void page.offsetWidth;
+                    page.classList.add("is-switching");
+                    clearTimeout(timer);
+                    timer = setTimeout(function () { page.classList.remove("is-switching"); }, 260);
+                }
+            }
+
+            function revealHashTarget() {
+                var id = decodeURIComponent(location.hash.slice(1));
+                var target = id && document.getElementById(id);
+                if (!target) { return; }
+                var group = target.closest("[data-part]");
+                var part = group && group.getAttribute("data-part");
+                var view = page.getAttribute("data-view") || "both";
+                if (part && view !== "both" && view !== part) {
+                    setView(part, false);
+                    target.scrollIntoView();
+                }
+            }
+
+            buttons.forEach(function (btn) {
+                btn.addEventListener("click", function () {
+                    setView(btn.getAttribute("data-set-view"), true);
+                    var rect = bar.getBoundingClientRect();
+                    if (rect.top < 0 || rect.bottom > window.innerHeight) {
+                        bar.scrollIntoView({ block: "start" });
+                    }
+                });
+            });
+
+            window.addEventListener("hashchange", revealHashTarget);
+            bar.hidden = false;
+            revealHashTarget();
+        })();
+    </script>
+
+</body>
+
+</html>
