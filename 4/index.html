@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="CS180 Project 4: manual and automatic image stitching, rectification, two-band blending, and cylindrical panoramas.">
+<title>Project 4 | CS180</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    if (window.renderMathInElement) {
+        renderMathInElement(document.body, {
+            delimiters: [{left: "$$", right: "$$", display: true}, {left: "$", right: "$", display: false}],
+            throwOnError: false
+        });
+    }
+});
+</script>
+<style>
+        @import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Manrope:wght@400;500;700&display=swap");
+
+        :root {
+            --page-bg-1: #f4f9ff;
+            --page-bg-2: #eef3f8;
+            --panel-bg: rgba(255, 255, 255, 0.9);
+            --card-shadow: 0 20px 48px rgba(15, 23, 42, 0.1);
+            --text: #1c2433;
+            --muted: #59657d;
+            --border: rgba(133, 156, 192, 0.25);
+            --accent: #1157a7;
+            --accent-2: #0e447f;
+            --code-bg: #f4f7fb;
+            --code-border: rgba(17, 87, 167, 0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Manrope", "Segoe UI", Tahoma, sans-serif;
+            background:
+                radial-gradient(circle at 12% 0%, rgba(127, 197, 255, 0.28) 0%, rgba(127, 197, 255, 0) 48%),
+                linear-gradient(180deg, var(--page-bg-1) 0%, var(--page-bg-2) 100%);
+            color: var(--text);
+            line-height: 1.78;
+        }
+
+        .project-page {
+            width: min(100%, 1120px);
+            margin: 0 auto;
+            padding: clamp(24px, 5vw, 56px) clamp(16px, 3vw, 32px) 96px;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 20px;
+            padding: 10px 16px;
+            color: #fff;
+            text-decoration: none;
+            font-weight: 700;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+            box-shadow: 0 10px 26px rgba(17, 87, 167, 0.25);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .back-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 14px 32px rgba(17, 87, 167, 0.3);
+        }
+
+        .project-title {
+            text-align: center;
+            margin-bottom: clamp(2.1rem, 5vw, 4rem);
+        }
+
+        .project-title h1 {
+            margin: 0 0 8px;
+            font-family: "Fraunces", Georgia, serif;
+            font-size: clamp(2.1rem, 4vw, 3.4rem);
+            line-height: 1.12;
+            letter-spacing: -0.04em;
+        }
+
+        .project-title p {
+            margin: 0.25rem auto 0;
+            max-width: 74ch;
+            color: var(--muted);
+            text-align: center;
+        }
+
+        .project-title .subtitle {
+            margin-top: 0.35rem;
+            font-size: 1rem;
+            color: var(--muted);
+        }
+
+        .toc {
+            margin: 0 auto 28px;
+            padding: 18px 20px 16px;
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.82);
+            box-shadow: var(--card-shadow);
+        }
+
+        .toc h3 {
+            margin: 0 0 14px;
+            text-align: center;
+            font-size: 1.06rem;
+            letter-spacing: 0.02em;
+            text-transform: uppercase;
+            color: var(--accent-2);
+        }
+
+        .toc-groups {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        .toc-group {
+            padding: 14px 16px 12px;
+            border: 1px solid var(--border);
+            border-left: 3px solid rgba(17, 87, 167, 0.35);
+            border-radius: 14px;
+            background: rgba(17, 87, 167, 0.03);
+        }
+
+        .toc-group-title {
+            margin: 0 0 0.5rem;
+            font-family: "Fraunces", Georgia, serif;
+            font-size: 1.08rem;
+            line-height: 1.3;
+        }
+
+        .toc-group-title a {
+            color: var(--accent-2);
+            text-decoration: none;
+        }
+
+        .toc-outline,
+        .toc-outline ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .toc-outline > li {
+            margin-top: 0.6rem;
+            break-inside: avoid;
+        }
+
+        .toc-outline a {
+            color: var(--text);
+            text-decoration: none;
+        }
+
+        .toc-outline > li > a {
+            font-weight: 700;
+        }
+
+        .toc-outline ul {
+            margin: 0.2rem 0 0 0.35rem;
+            padding-left: 0.8rem;
+            border-left: 1px solid var(--border);
+        }
+
+        .toc-outline ul a {
+            display: inline-block;
+            padding: 1px 0;
+            color: var(--muted);
+            font-size: 0.92rem;
+            font-weight: 500;
+            line-height: 1.5;
+        }
+
+        .toc-outline ul ul a {
+            font-size: 0.88rem;
+        }
+
+        .toc-outline a:hover,
+        .toc-group-title a:hover {
+            color: var(--accent);
+        }
+
+        .part-filter {
+            display: flex;
+            width: fit-content;
+            max-width: 100%;
+            margin: 0 auto 18px;
+            padding: 4px;
+            gap: 4px;
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.85);
+            box-shadow: 0 8px 22px rgba(15, 23, 42, 0.06);
+        }
+
+        .part-filter[hidden] {
+            display: none;
+        }
+
+        .part-filter-btn {
+            flex: 1 1 auto;
+            padding: 8px 20px;
+            border: 0;
+            border-radius: 999px;
+            background: transparent;
+            color: var(--muted);
+            font-family: "Manrope", "Segoe UI", Tahoma, sans-serif;
+            font-size: 0.92rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s ease, color 0.2s ease;
+        }
+
+        .part-filter-btn:hover {
+            color: var(--accent-2);
+            background: rgba(17, 87, 167, 0.08);
+        }
+
+        .part-filter-btn[aria-pressed="true"] {
+            color: #fff;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+        }
+
+        .part-filter-btn:focus-visible {
+            outline: 3px solid rgba(17, 87, 167, 0.5);
+            outline-offset: 2px;
+        }
+
+        .project-page[data-view="a"] [data-part="b"],
+        .project-page[data-view="b"] [data-part="a"] {
+            display: none;
+        }
+
+        .project-page[data-view="a"] .toc-groups,
+        .project-page[data-view="b"] .toc-groups {
+            grid-template-columns: minmax(0, 1fr);
+        }
+
+        .project-page[data-view="a"] .toc-outline,
+        .project-page[data-view="b"] .toc-outline {
+            column-count: 2;
+            column-gap: 32px;
+        }
+
+        .project-page.is-switching [data-part] {
+            animation: part-fade 0.2s ease;
+        }
+
+        @keyframes part-fade {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .part {
+            margin-bottom: clamp(2.5rem, 6vw, 5rem);
+            padding: clamp(18px, 3vw, 30px);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            background: var(--panel-bg);
+            box-shadow: var(--card-shadow);
+        }
+
+        .part h2 {
+            margin: 0 0 1rem;
+            font-family: "Fraunces", Georgia, serif;
+            font-size: clamp(1.45rem, 2.6vw, 2.2rem);
+            letter-spacing: -0.03em;
+            text-align: center;
+        }
+
+        .part h3 {
+            margin: 1.2rem 0 0.35rem;
+            font-size: clamp(1.1rem, 1.8vw, 1.45rem);
+            color: #233551;
+        }
+
+        .part h4 {
+            margin: 1rem 0 0.4rem;
+            font-size: 1.08rem;
+            color: #2b405d;
+        }
+
+        p {
+            max-width: 76ch;
+            margin: 0.8rem auto 0;
+            text-align: left;
+            hyphens: none;
+            overflow-wrap: normal;
+        }
+
+        .mosaic-heading-row {
+            max-width: 76ch;
+            margin: 1.45rem auto 0.28rem;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            align-items: baseline;
+            column-gap: 12px;
+        }
+
+        .mosaic-heading-row h3 {
+            margin: 0;
+        }
+
+        .jump-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 999px;
+            border: 1px solid rgba(17, 87, 167, 0.22);
+            background: rgba(17, 87, 167, 0.07);
+            color: var(--accent-2);
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.9rem;
+            line-height: 1.25;
+            white-space: nowrap;
+            transition: transform 0.16s ease, background-color 0.16s ease, border-color 0.16s ease;
+        }
+
+        .jump-link:hover {
+            transform: translateY(-1px);
+            border-color: rgba(17, 87, 167, 0.38);
+            background: rgba(17, 87, 167, 0.12);
+            color: var(--accent);
+        }
+
+        .jump-link:focus-visible {
+            outline: 2px solid rgba(17, 87, 167, 0.45);
+            outline-offset: 2px;
+        }
+
+        .list-tight {
+            max-width: 76ch;
+            margin: 0.8rem auto 0;
+            padding-left: 1.2rem;
+        }
+
+        .list-tight li {
+            margin-bottom: 0.35rem;
+        }
+
+        .note {
+            margin: 1rem auto 0;
+            max-width: 76ch;
+            padding: 12px 14px;
+            border-left: 4px solid var(--accent);
+            background: rgba(17, 87, 167, 0.08);
+            border-radius: 8px;
+        }
+
+        .formula-block {
+            margin: 1rem auto;
+            max-width: 76ch;
+            padding: 12px 14px;
+            border: 1px solid rgba(17, 87, 167, 0.15);
+            border-radius: 12px;
+            background: rgba(244, 247, 251, 0.9);
+            font-size: 0.97rem;
+            line-height: 1.7;
+            white-space: pre-wrap;
+        }
+
+        .formula-block .katex-display {
+            margin: 0.6rem 0;
+        }
+
+        .image-pair,
+        .gallery,
+        .triple-grid {
+            display: grid;
+            gap: 16px;
+            margin: 20px auto 10px;
+            max-width: 100%;
+        }
+
+        .image-pair {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .gallery {
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+        }
+
+        .triple-grid {
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        }
+
+        figure {
+            margin: 0;
+            border-radius: 14px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 14px 34px rgba(15, 23, 42, 0.08);
+        }
+
+        img {
+            display: block;
+            width: 100%;
+            height: auto;
+            object-fit: contain;
+            background: rgba(133, 156, 192, 0.08);
+        }
+
+        .gallery img,
+        .image-pair img,
+        .triple-grid img {
+            max-height: 380px;
+        }
+
+        .full-width-image {
+            width: min(100%, 880px);
+            margin: 20px auto 12px;
+        }
+
+        figcaption {
+            margin: 10px;
+            color: var(--muted);
+            font-size: 0.92rem;
+            text-align: center;
+        }
+
+        blockquote {
+            margin: 1rem auto 0;
+            max-width: 76ch;
+            padding: 12px 16px;
+            border-left: 4px solid var(--accent);
+            color: var(--text);
+            background: rgba(17, 87, 167, 0.06);
+            border-radius: 8px;
+        }
+
+        .katex {
+            font-size: 1.02em;
+        }
+
+        @media (max-width: 700px) {
+            .project-page {
+                padding: 20px 14px 72px;
+            }
+
+            .image-pair {
+                grid-template-columns: 1fr;
+            }
+
+            .part {
+                margin-bottom: 3.2rem;
+                border-radius: 16px;
+                padding: 16px;
+            }
+            .mosaic-heading-row {
+                grid-template-columns: 1fr;
+                row-gap: 8px;
+            }
+            .jump-link {
+                justify-self: start;
+            }
+            .project-page[data-view="a"] .toc-outline,
+            .project-page[data-view="b"] .toc-outline {
+                column-count: 1;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .part-filter {
+                width: 100%;
+            }
+
+            .part-filter-btn {
+                padding: 8px 10px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .project-page.is-switching [data-part] {
+                animation: none;
+            }
+
+            .part-filter-btn {
+                transition: none;
+            }
+        }
+    </style>
+<link rel="stylesheet" href="../project-common.css">
+<style>
+.part > figure { width: min(100%, 880px); margin: 20px auto 12px; }
+.part h3 { margin-top: 2rem; }
+.formula-block { white-space: normal; overflow-x: auto; }
+.corner-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+.corner-grid figure { width: 100%; }
+@media (max-width: 600px) { .corner-grid { grid-template-columns: 1fr; } }
+@media (max-width: 900px) { .toc-groups { grid-template-columns: 1fr; } }
+.table-wrap { overflow-x: auto; margin: 24px auto; }
+table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border); }
+thead { background: #eef4fb; }
+.back-link { margin-bottom: 28px; }
+section, h3 { scroll-margin-top: 24px; }
+@media print {
+    body { background: white; color: black; font-size: 10pt; }
+    .project-page { width: 100%; padding: 0; }
+    .back-link, .toc, .part-filter { display: none; }
+    .project-page [data-part],
+    .project-page[data-view] [data-part] { display: block !important; animation: none !important; }
+    .part { padding: 0; margin: 24px 0; border: 0; box-shadow: none; background: white; }
+    figure, .formula-block, tr { break-inside: avoid; box-shadow: none; }
+    .corner-grid img { max-height: 110mm; }
+    figure img { max-height: 160mm; width: 100%; object-fit: contain; }
+    h2, h3, h4 { break-after: avoid; }
+    .formula-block { overflow: visible; font-size: 9pt; }
+    .part > figure { width: 100%; }
+    a { color: inherit; text-decoration: none; }
+}
+</style>
+</head>
+<body>
+<main class="project-page">
+<a class="back-link" href="../index.html">← Back to Portfolio</a>
+<header class="project-title">
+<h1>Project 4: [Auto]Stitching Photo Mosaics</h1>
+<p class="subtitle">CS180: Introduction to Computer Vision and Computational Photography</p>
+<p>Part A: Image Warping and Mosaicing · Part B: Feature Matching for Autostitching</p>
+<p class="project-summary">I estimate homographies from manual and automatic correspondences, rectify planar objects, and stitch three image pairs. I also compare blending methods and cylindrical projections.</p>
+</header>
+<div class="part-filter" role="group" aria-label="Choose which report parts to show" hidden>
+<button type="button" class="part-filter-btn" data-set-view="both" aria-pressed="true">Show Both</button>
+<button type="button" class="part-filter-btn" data-set-view="a" aria-pressed="false">Part A</button>
+<button type="button" class="part-filter-btn" data-set-view="b" aria-pressed="false">Part B</button>
+</div>
+<nav class="toc" aria-label="Table of contents">
+<h3>Table of Contents</h3>
+<div class="toc-groups">
+<div class="toc-group" data-part="a">
+<h4 class="toc-group-title"><a href="#a1">Part A: Image Warping and Mosaicing</a></h4>
+<ul class="toc-outline">
+<li><a href="#a1">A.1: Source Photographs</a></li>
+<li><a href="#a2">A.2: Recover Homographies</a>
+<ul><li><a href="#homography-estimation">Homography Estimation</a></li><li><a href="#recovered-matrices">Recovered Matrices and Errors</a></li></ul></li>
+<li><a href="#a3">A.3: Warp the Images</a>
+<ul><li><a href="#inverse-warping">Inverse Warping and Interpolation</a></li><li><a href="#rectification">Rectification</a></li><li><a href="#interpolation-comparison">Speed and Quality Comparison</a></li></ul></li>
+<li><a href="#a4">A.4: Blend Images into Mosaics</a>
+<ul><li><a href="#feather-blending">Feather Blending</a></li><li><a href="#gateway">Mosaic 1: Gateway</a></li><li><a href="#opposite">Mosaic 2: Opposite Gateway</a></li><li><a href="#iceland">Mosaic 3: Iceland River</a></li></ul></li>
+<li><a href="#two-band">Additional Blending Comparison</a></li><li><a href="#a5">A.5: Cylindrical Projection</a><ul><li><a href="#cylinder-focal">Focal-Length Comparison</a></li><li><a href="#cylinder-pitch">Pitch Comparison</a></li><li><a href="#cylinder-selected">Selected Results</a></li></ul></li><li><a href="#summary">Part A Summary</a></li>
+</ul>
+</div>
+<div class="toc-group" data-part="b">
+<h4 class="toc-group-title"><a href="#part-b">Part B: Feature Matching for Autostitching</a></h4>
+<ul class="toc-outline">
+<li><a href="#b1">B.1: Harris Corners and ANMS</a><ul><li><a href="#b1-harris">Harris Corner Detection</a></li><li><a href="#b1-anms">Adaptive Non-Maximal Suppression</a></li></ul></li><li><a href="#b2">B.2: Feature Descriptors</a></li><li><a href="#b3">B.3: Feature Matching</a></li><li><a href="#b4">B.4: RANSAC and Automatic Mosaics</a><ul><li><a href="#b4-ransac">Four-Point RANSAC</a></li><li><a href="#b4-homographies">Recovered Homographies</a></li><li><a href="#b4-manual-auto">Manual and Automatic Stitching</a></li></ul></li>
+</ul>
+</div>
+</div>
+</nav>
+<section class="part" id="a1" data-part="a">
+<h2>A.1: Source Photographs</h2>
+<p>For each campus pair, I stayed in one position and rotated the camera. I moved between the two campus scenes. The Iceland pair was captured from a fixed viewpoint. Each pair has overlapping content that I use to select matching points.</p>
+<p>I apply the stored image orientation, convert the photographs to RGB, and resize them to a maximum side length of 1400 pixels. All point coordinates and reported pixel errors refer to these working images.</p>
+<figure id="sources-gateway"><a href="media/a1_gateway_sources.png"><img decoding="async" src="media/a1_gateway_sources.png" width="2117" height="643" alt="Gateway: the two views of the curved building."></a><figcaption>Gateway: the two views of the curved building.</figcaption></figure><figure id="sources-opposite_gateway"><a href="media/a1_opposite_gateway_sources.png"><img decoding="async" src="media/a1_opposite_gateway_sources.png" width="2117" height="643" alt="Opposite Gateway: the two views across the lawn."></a><figcaption>Opposite Gateway: the two views across the lawn.</figcaption></figure><figure id="sources-iceland_river"><a href="media/a1_iceland_river_sources.png"><img decoding="async" src="media/a1_iceland_river_sources.png" width="2117" height="643" alt="Iceland River: overlapping views of the rocky riverbank."></a><figcaption>Iceland River: overlapping views of the rocky riverbank.</figcaption></figure></section><section class="part" id="a2" data-part="a">
+<h2>A.2: Recover Homographies</h2>
+<p>I select 12 point pairs for each mosaic. On the buildings, I use corners and window-frame intersections. For Iceland, I use rocks and snow boundaries rather than moving water. The same number identifies a matching point in both images.</p>
+<figure><a href="media/a2_gateway_selected_points.png"><img decoding="async" src="media/a2_gateway_selected_points.png" width="2117" height="661" alt="Gateway: the 12 manually selected correspondences."></a><figcaption>Gateway: the 12 manually selected correspondences.</figcaption></figure><figure><a href="media/a4_opposite_gateway_selected_points.png"><img decoding="async" src="media/a4_opposite_gateway_selected_points.png" width="2117" height="661" alt="Opposite Gateway: the 12 manually selected correspondences."></a><figcaption>Opposite Gateway: the 12 manually selected correspondences.</figcaption></figure><figure><a href="media/a4_iceland_river_selected_points.png"><img decoding="async" src="media/a4_iceland_river_selected_points.png" width="2117" height="661" alt="Iceland River: the 12 manually selected correspondences."></a><figcaption>Iceland River: the 12 manually selected correspondences.</figcaption></figure><h3 id="homography-estimation">Homography Estimation</h3>
+<p>I implement <code>computeH(im1_pts, im2_pts)</code> to map image 1 to image 2. Fixing the bottom-right entry of $H$ to 1 leaves eight unknowns. For a correspondence $(x,y)\leftrightarrow(u,v)$:</p>
+<div class="formula-block">$$H=\begin{bmatrix}h_1&amp;h_2&amp;h_3\\h_4&amp;h_5&amp;h_6\\h_7&amp;h_8&amp;1\end{bmatrix}.$$</div>
+<div class="formula-block">$$u=\frac{h_1x+h_2y+h_3}{h_7x+h_8y+1},\quad v=\frac{h_4x+h_5y+h_6}{h_7x+h_8y+1}.$$</div>
+<p>Rearranging gives two linear equations per correspondence:</p>
+<div class="formula-block">$$\begin{bmatrix}x&amp;y&amp;1&amp;0&amp;0&amp;0&amp;-ux&amp;-uy\\0&amp;0&amp;0&amp;x&amp;y&amp;1&amp;-vx&amp;-vy\end{bmatrix}
+\begin{bmatrix}h_1\\h_2\\h_3\\h_4\\h_5\\h_6\\h_7\\h_8\end{bmatrix}=\begin{bmatrix}u\\v\end{bmatrix}.$$</div>
+<p>Four pairs give the minimum eight equations, but small clicking errors can make that fit unstable. I use 12 pairs spread across the overlap, giving 24 equations for eight unknowns, and solve $Ah=b$ with <code>np.linalg.lstsq</code>. This minimizes the algebraic residual. I separately measure reprojection error as the distance between a projected point and its selected match in image 2.</p>
+<h3 id="recovered-matrices">Recovered Matrices and Errors</h3>
+<h4>Gateway</h4><div class="formula-block">$$H=\begin{bmatrix}3.433288 &amp; -0.6384982 &amp; -2362.846\\1.215267 &amp; 2.612035 &amp; -1104.293\\0.001811713 &amp; -0.0003060326 &amp; 1\end{bmatrix}.$$</div><h4>Opposite Gateway</h4><div class="formula-block">$$H=\begin{bmatrix}2.304793 &amp; -0.2664273 &amp; -1310.421\\0.570639 &amp; 1.853821 &amp; -503.8943\\0.0009550233 &amp; -0.00009480298 &amp; 1\end{bmatrix}.$$</div><h4>Iceland River</h4><div class="formula-block">$$H=\begin{bmatrix}-0.01360226 &amp; 0.04220481 &amp; 653.3789\\-0.2374977 &amp; 0.7277164 &amp; 55.20363\\-0.0007499071 &amp; 0.0000823272 &amp; 1\end{bmatrix}.$$</div><div class="table-wrap"><table><caption>Reprojection errors on the 12 fitting correspondences</caption><thead><tr><th scope="col">Image pair</th><th scope="col">RMS error</th><th scope="col">Maximum error</th></tr></thead><tbody>
+<tr><th scope="row">Gateway</th><td>1.537 px</td><td>3.115 px</td></tr>
+<tr><th scope="row">Opposite Gateway</th><td>1.939 px</td><td>3.175 px</td></tr>
+<tr><th scope="row">Iceland River</th><td>1.115 px</td><td>2.204 px</td></tr></tbody></table></div>
+<p>A synthetic test recovers a known homography. The errors above describe the selected fitting points, so I also inspect the mosaic overlaps for alignment elsewhere.</p>
+<figure><a href="media/a2_gateway_reprojection.png"><img decoding="async" src="media/a2_gateway_reprojection.png" width="1794" height="1072" alt="Gateway image 2: selected points are red crosses and projected points are cyan circles."></a><figcaption>Gateway image 2: selected points are red crosses and projected points are cyan circles.</figcaption></figure></section><section class="part" id="a3" data-part="a">
+<h2>A.3: Warp the Images</h2>
+<h3 id="inverse-warping">Inverse Warping and Interpolation</h3>
+<p>I implement inverse warping. First, I transform the four source corners to find the output bounds. For each output pixel, I apply $H^{-1}$, divide by the homogeneous coordinate, and sample the source image. Looking up a source position for every destination pixel avoids the gaps caused by forward mapping. A Boolean mask records which output pixels are valid, so black image pixels are not mistaken for empty space.</p>
+<p><code>warpImageNearestNeighbor</code> rounds to the nearest source pixel. <code>warpImageBilinear</code> combines the four surrounding pixels. For a source position $(x,y)$, I set $x_0=\lfloor x\rfloor$ and $y_0=\lfloor y\rfloor$. The offsets are $d_x=x-x_0$ and $d_y=y-y_0$. The four weights are:</p>
+<div class="formula-block">$$w_{00}=(1-d_x)(1-d_y),\quad w_{10}=d_x(1-d_y),\quad w_{01}=(1-d_x)d_y,\quad w_{11}=d_xd_y.$$</div>
+<p>I multiply each weight by its corresponding RGB sample and add the four contributions. Positions outside the source image are marked invalid. At the right or bottom boundary, the neighboring index is clamped to the last pixel. Both methods return the warped image, its valid mask, and its origin in the destination coordinate system.</p>
+<p>Both sampling methods use NumPy indexing and arithmetic. Identity, integer-translation, and half-pixel tests check the coordinates and interpolation weights.</p>
+<figure><a href="media/a3_gateway_interpolation_comparison.png"><img decoding="async" src="media/a3_gateway_interpolation_comparison.png" width="2117" height="1461" alt="Gateway image 1 warped into image 2’s coordinates. The close-ups compare nearest-neighbor and bilinear sampling on the same window detail."></a><figcaption>Gateway image 1 warped into image 2’s coordinates. The close-ups compare nearest-neighbor and bilinear sampling on the same window detail.</figcaption></figure><h3 id="rectification">Rectification</h3>
+<p>I select the four corners in top-left, top-right, bottom-right, bottom-left order relative to the upright object. I map them to the corresponding corners of an upright rectangle, so the destination points are defined by the known shape rather than a second photograph. The painting uses the painted area inside its frame. Its dimensions are 65.1 cm wide by 100.3 cm high, from the <a href="https://www.getty.edu/cona/CONAFullSubject.aspx?subid=700007491">Getty catalog</a>. The business card measures approximately 5.1 cm wide by 8.9 cm high.</p>
+<p>I use an output height of 700 pixels and set the width from the physical proportions. The painting becomes 455 × 700 pixels and the card becomes 402 × 700 pixels. I crop each source around the selected object before warping, then extract the destination rectangle.</p>
+<figure><a href="media/a1_rectification_sources.png"><img decoding="async" src="media/a1_rectification_sources.png" width="1517" height="1371" alt="The original painting and business-card photographs."></a><figcaption>The original painting and business-card photographs.</figcaption></figure><div class="corner-grid"><figure><a href="media/a3_painting_corners.png"><img decoding="async" src="media/a3_painting_corners.png" width="764" height="1367" alt="Painting corners inside the decorative frame."></a><figcaption>Painting corners inside the decorative frame.</figcaption></figure><figure><a href="media/a3_business_card_corners.png"><img decoding="async" src="media/a3_business_card_corners.png" width="764" height="1367" alt="Business-card corners in perimeter order."></a><figcaption>Business-card corners in perimeter order.</figcaption></figure></div>
+<figure><a href="media/a3_painting_rectification.png"><img decoding="async" src="media/a3_painting_rectification.png" width="1817" height="1200" alt="Painting: source crop, nearest-neighbor rectification, and bilinear rectification."></a><figcaption>Painting: source crop, nearest-neighbor rectification, and bilinear rectification.</figcaption></figure><figure><a href="media/a3_business_card_rectification.png"><img decoding="async" src="media/a3_business_card_rectification.png" width="1817" height="1154" alt="Business card: source crop, nearest-neighbor rectification, and bilinear rectification."></a><figcaption>Business card: source crop, nearest-neighbor rectification, and bilinear rectification.</figcaption></figure><h3 id="interpolation-comparison">Speed and Quality Comparison</h3>
+<div class="table-wrap"><table><caption>Measured interpolation times</caption><thead><tr><th scope="col">Input</th><th scope="col">Nearest neighbor</th><th scope="col">Bilinear</th></tr></thead><tbody><tr><th scope="row">Gateway full image</th><td>2.117 s</td><td>4.091 s</td></tr><tr><th scope="row">Painting</th><td>0.268 s</td><td>0.458 s</td></tr><tr><th scope="row">Business card</th><td>0.436 s</td><td>0.761 s</td></tr></tbody></table></div><p>Both objects become upright rectangles. Bilinear interpolation gives smoother lettering and flower outlines on the card, while nearest neighbor leaves more jagged edges. The painting also looks softer with bilinear sampling. In this run, nearest neighbor was faster. Bilinear uses four samples per pixel instead of one, but I prefer its smoother edges for the final images. The Gateway timings cover the full-image warp. The painting and card timings cover their source-crop warps and exclude extracting the final rectangles. All timings include coordinate mapping and interpolation and vary between runs.</p>
+</section><section class="part" id="a4" data-part="a"><h2>A.4: Blend Images into Mosaics</h2>
+<h3 id="feather-blending">Feather Blending</h3>
+<p>I find a canvas that contains both aligned images using their sizes and coordinate origins. The origins determine where each image is placed, including when a warp extends into negative coordinates. I pad each valid mask with zeros and use a distance transform to assign larger weights to pixels farther from the boundary. I add the weighted colors and divide by the total weight. Pixels outside an image’s mask contribute nothing. Where only one image is present, normalization preserves its color. Where both weights are zero, I leave the pixel black and mark it invalid.</p>
+<div class="formula-block">$$I(p)=\frac{w_1(p)I_1(p)+w_2(p)I_2(p)}{w_1(p)+w_2(p)}.$$</div>
+<p>This feather blending softens the transition between photographs. It does not correct geometric misalignment or motion in the scene. Black regions in the mosaics have no image coverage.</p>
+<div class="mosaic-heading-row"><h3 id="gateway">Mosaic 1: Gateway</h3><a class="jump-link" href="#sources-gateway">↟ View source photographs</a></div>
+<p>I warp image 1 into image 2’s coordinate system and blend the overlap.</p>
+<figure><a href="media/a4_gateway_mosaic.png"><img decoding="async" src="media/a4_gateway_mosaic.png" width="5175" height="2360" alt="Gateway mosaic with image 2 as the reference. Output size: 5175 × 2360 pixels."></a><figcaption>Gateway mosaic with image 2 as the reference. Output size: 5175 × 2360 pixels.</figcaption></figure><figure><a href="media/a4_gateway_overlap_detail.png"><img decoding="async" src="media/a4_gateway_overlap_detail.png" width="1517" height="912" alt="Gateway overlap: reference detail on the left and the same region after blending on the right."></a><figcaption>Gateway overlap: reference detail on the left and the same region after blending on the right.</figcaption></figure><p>The building joins across the overlap, although some window edges and foliage look softened or doubled. The left side stretches strongly in this projection.</p><figure><a href="media/a4_gateway_reference_comparison.png"><img decoding="async" src="media/a4_gateway_reference_comparison.png" width="1901" height="1817" alt="Gateway with image 2 fixed above and image 1 fixed below."></a><figcaption>Gateway with image 2 fixed above and image 1 fixed below.</figcaption></figure><p>Changing the reference moves the strongest distortion to the other side. It changes the appearance of the mosaic but does not remove alignment errors.</p>
+<div class="mosaic-heading-row"><h3 id="opposite">Mosaic 2: Opposite Gateway</h3><a class="jump-link" href="#sources-opposite_gateway">↟ View source photographs</a></div>
+<p>I use the same procedure, warping image 1 into image 2 and blending with distance-based weights.</p><figure><a href="media/a4_opposite_gateway_mosaic.png"><img decoding="async" src="media/a4_opposite_gateway_mosaic.png" width="3043" height="1538" alt="Opposite Gateway mosaic. Output size: 3043 × 1538 pixels."></a><figcaption>Opposite Gateway mosaic. Output size: 3043 × 1538 pixels.</figcaption></figure><figure><a href="media/a4_opposite_gateway_overlap_detail.png"><img decoding="async" src="media/a4_opposite_gateway_overlap_detail.png" width="2117" height="697" alt="Opposite Gateway overlap: original reference detail and blended result."></a><figcaption>Opposite Gateway overlap: original reference detail and blended result.</figcaption></figure><p>The result extends the view across the lawn. Some foliage, car edges, and building details show ghosting. Manual point errors, slight camera movement, or motion in the scene could contribute. Feathering makes the transition gradual but cannot fix those differences.</p>
+<div class="mosaic-heading-row"><h3 id="iceland">Mosaic 3: Iceland River</h3><a class="jump-link" href="#sources-iceland_river">↟ View source photographs</a></div>
+<p>For this pair, the estimated homography’s denominator changes sign across the full image. The full warp therefore crosses the projective horizon and cannot fit on a finite canvas. The inverse transform has the same problem for the other image.</p>
+<p>I warp both images into a shared projection instead. With the estimated $H$ scaled to have $H_{33}=1$, I use:</p>
+<div class="formula-block">$$G_1=\frac{I+H}{2},\qquad G_2=G_1H^{-1},\qquad G_2H=G_1.$$</div>
+<p>The last equality preserves the estimated correspondence mapping. This is a chosen projective frame, not a calibrated halfway camera view. I check that both transforms are invertible and their denominators keep one sign at the image corners before warping. Both images then have finite bounds.</p>
+<figure><a href="media/a4_iceland_river_mosaic.png"><img decoding="async" src="media/a4_iceland_river_mosaic.png" width="3598" height="1992" alt="Iceland River mosaic in the shared projection. Output size: 3598 × 1992 pixels."></a><figcaption>Iceland River mosaic in the shared projection. Output size: 3598 × 1992 pixels.</figcaption></figure><p>The rocky riverbank connects through the overlap. The outer portions are stretched and softened, especially on the left. Flowing water changes between images, so its details do not all coincide. The shared projection makes the canvas finite but does not correct these differences.</p>
+</section>
+<section class="part" id="two-band" data-part="a"><h2>Additional Blending Comparison</h2><p>I compare feather blending with a two-band blend while keeping the manual homographies and output frames fixed. A Gaussian blur with standard deviation 5 output pixels separates each warped image into smooth color and fine detail. I divide the blurred masked colors by the blurred validity mask to prevent empty black pixels from darkening the boundaries.</p><p>I feather the smooth bands with the same distance-based weights as before. At each pixel, I take the detail band from whichever image has the larger weight. Selecting one detail band avoids averaging displaced sharp edges, but a change in the selected image can introduce a seam. This is a two-band blend rather than a full multilevel Laplacian pyramid.</p><div class="formula-block">$$I_{\mathrm{out}}=\frac{w_1L_1+w_2L_2}{w_1+w_2}+D_k,\quad D_i=I_i-L_i,\quad k=\arg\max_i w_i.$$</div><h3>Gateway</h3><figure><a href="media/a4_gateway_blending_comparison.png"><img loading="lazy" decoding="async" src="media/a4_gateway_blending_comparison.png" width="2417" height="836" alt="Gateway: feather blending and two-band blending with identical geometry."></a><figcaption>Gateway: feather blending and two-band blending with identical geometry.</figcaption></figure><figure><a href="media/a4_gateway_blending_detail.png"><img loading="lazy" decoding="async" src="media/a4_gateway_blending_detail.png" width="1817" height="727" alt="Gateway: the same overlap region, enlarged to compare fine detail."></a><figcaption>Gateway: the same overlap region, enlarged to compare fine detail.</figcaption></figure><h3>Opposite Gateway</h3><figure><a href="media/a4_opposite_gateway_blending_comparison.png"><img loading="lazy" decoding="async" src="media/a4_opposite_gateway_blending_comparison.png" width="2417" height="866" alt="Opposite Gateway: feather blending and two-band blending with identical geometry."></a><figcaption>Opposite Gateway: feather blending and two-band blending with identical geometry.</figcaption></figure><figure><a href="media/a4_opposite_gateway_blending_detail.png"><img loading="lazy" decoding="async" src="media/a4_opposite_gateway_blending_detail.png" width="1817" height="727" alt="Opposite Gateway: the same overlap region, enlarged to compare fine detail."></a><figcaption>Opposite Gateway: the same overlap region, enlarged to compare fine detail.</figcaption></figure><h3>Iceland River</h3><figure><a href="media/a4_iceland_river_blending_comparison.png"><img loading="lazy" decoding="async" src="media/a4_iceland_river_blending_comparison.png" width="2417" height="894" alt="Iceland River: feather blending and two-band blending with identical geometry."></a><figcaption>Iceland River: feather blending and two-band blending with identical geometry.</figcaption></figure><figure><a href="media/a4_iceland_river_blending_detail.png"><img loading="lazy" decoding="async" src="media/a4_iceland_river_blending_detail.png" width="1817" height="727" alt="Iceland River: the same overlap region, enlarged to compare fine detail."></a><figcaption>Iceland River: the same overlap region, enlarged to compare fine detail.</figcaption></figure><p>The two-band results retain sharper window frames, foliage, and car edges than broad feathering. Some riverbank details also look less doubled. The change is easier to see in the close-ups than in the full mosaics. Neither blend fixes the underlying correspondence errors, and broad displaced structures or moving water can still disagree.</p></section><section class="part" id="a5" data-part="a"><h2>A.5: Cylindrical Projection</h2><p>I use a cylindrical destination surface for the two campus scenes to reduce the side stretching of a wide planar mosaic. I retain the manual homography and apply the same change of output coordinates to both views. This differs from assuming that independently cylindrical-warped images can be stitched by translation alone.</p><p>Let the reference image center be $(c_x,c_y)$ and let $f$ be an approximate focal length in working-image pixels. The forward cylindrical coordinates are:</p><div class="formula-block">$$u=f\arctan\left(\frac{x-c_x}{f}\right),\qquad v=\frac{f(y-c_y)}{\sqrt{(x-c_x)^2+f^2}}.$$</div><p>For inverse sampling, I recover a reference-plane position from each cylindrical output pixel, then apply the inverse source-to-reference homography:</p><div class="formula-block">$$\theta=u/f,\qquad x=f\tan\theta+c_x,\qquad y=\frac{v}{\cos\theta}+c_y.$$</div><p>I bilinearly sample the resized source photographs directly. I do not resample a previously stitched panorama. Sampling the transformed image boundaries determines the curved output bounds, with a two-pixel margin. Both the planar and cylindrical views below use two-band blending.</p><h3 id="cylinder-focal">Focal-Length Comparison</h3><p>I compare $f/W=0.5$, $0.7$, and $1.0$ at zero pitch, where $W=1400$ pixels. A smaller focal length compresses the view more horizontally. I select $f=980$ pixels as a visual compromise between the more compressed 700-pixel view and the wider 1400-pixel view. This is a display parameter under an approximate camera model, not a calibrated focal-length measurement.</p><figure><a href="media/a5_gateway_focal_comparison.png"><img loading="lazy" decoding="async" src="media/a5_gateway_focal_comparison.png" width="2417" height="772" alt="Gateway: focal lengths 700, 980, and 1400 pixels, with pitch held at zero."></a><figcaption>Gateway: focal lengths 700, 980, and 1400 pixels, with pitch held at zero.</figcaption></figure><figure><a href="media/a5_opposite_gateway_focal_comparison.png"><img loading="lazy" decoding="async" src="media/a5_opposite_gateway_focal_comparison.png" width="2417" height="782" alt="Opposite Gateway: focal lengths 700, 980, and 1400 pixels, with pitch held at zero."></a><figcaption>Opposite Gateway: focal lengths 700, 980, and 1400 pixels, with pitch held at zero.</figcaption></figure><h3 id="cylinder-pitch">Pitch Comparison</h3><p>To reduce the inherited camera tilt, I rotate viewing rays before cylindrical sampling. I use $Q=KR_x(\alpha)K^{-1}$, where $K$ contains the approximate focal length and image center. The source mappings become $QH$ and $Q$, so their estimated alignment is preserved. This changes the viewing orientation rather than rotating the finished panorama as a flat image.</p><p>At $f=980$ pixels, I compare pitch adjustments of 0, 15, and 30 degrees. The 15-degree view makes the buildings look more upright and the ground less tilted. The 30-degree view overcorrects both scenes. These angles are chosen for presentation rather than recovered camera poses.</p><figure><a href="media/a5_gateway_pitch_comparison.png"><img loading="lazy" decoding="async" src="media/a5_gateway_pitch_comparison.png" width="2417" height="789" alt="Gateway: pitch adjustments of 0, 15, and 30 degrees at f = 980 pixels."></a><figcaption>Gateway: pitch adjustments of 0, 15, and 30 degrees at f = 980 pixels.</figcaption></figure><figure><a href="media/a5_opposite_gateway_pitch_comparison.png"><img loading="lazy" decoding="async" src="media/a5_opposite_gateway_pitch_comparison.png" width="2417" height="799" alt="Opposite Gateway: pitch adjustments of 0, 15, and 30 degrees at f = 980 pixels."></a><figcaption>Opposite Gateway: pitch adjustments of 0, 15, and 30 degrees at f = 980 pixels.</figcaption></figure><h3 id="cylinder-selected">Selected Cylindrical Results</h3><table><caption>Selected settings at the working image resolution</caption><thead><tr><th>Scene</th><th>Focal length</th><th>Pitch</th><th>Output size</th></tr></thead><tbody><tr><td>Gateway</td><td>980 px</td><td>15°</td><td>2046 × 897</td></tr><tr><td>Opposite Gateway</td><td>980 px</td><td>15°</td><td>1888 × 891</td></tr></tbody></table><figure><a href="media/a5_gateway_selected_comparison.png"><img loading="lazy" decoding="async" src="media/a5_gateway_selected_comparison.png" width="2417" height="746" alt="Gateway: planar view, zero-pitch cylinder, and selected 15-degree cylinder. All use two-band blending."></a><figcaption>Gateway: planar view, zero-pitch cylinder, and selected 15-degree cylinder. All use two-band blending.</figcaption></figure><figure><a href="media/a5_gateway_selected_cylindrical.png"><img loading="lazy" decoding="async" src="media/a5_gateway_selected_cylindrical.png" width="2046" height="897" alt="Gateway: selected cylindrical panorama with f = 980 pixels and pitch adjustment of 15 degrees."></a><figcaption>Gateway: selected cylindrical panorama with f = 980 pixels and pitch adjustment of 15 degrees.</figcaption></figure><figure><a href="media/a5_opposite_gateway_selected_comparison.png"><img loading="lazy" decoding="async" src="media/a5_opposite_gateway_selected_comparison.png" width="2417" height="766" alt="Opposite Gateway: planar view, zero-pitch cylinder, and selected 15-degree cylinder. All use two-band blending."></a><figcaption>Opposite Gateway: planar view, zero-pitch cylinder, and selected 15-degree cylinder. All use two-band blending.</figcaption></figure><figure><a href="media/a5_opposite_gateway_selected_cylindrical.png"><img loading="lazy" decoding="async" src="media/a5_opposite_gateway_selected_cylindrical.png" width="1888" height="891" alt="Opposite Gateway: selected cylindrical panorama with f = 980 pixels and pitch adjustment of 15 degrees."></a><figcaption>Opposite Gateway: selected cylindrical panorama with f = 980 pixels and pitch adjustment of 15 degrees.</figcaption></figure><p>The selected views reduce the severe stretching on the left side and give a more upright presentation. Curved boundaries and black uncovered regions remain. Cylindrical projection redistributes distortion but does not repair parallax, motion, or local alignment errors. I retain the complete boundaries rather than cropping away scene content.</p></section>
+<section class="part" id="summary" data-part="a">
+<h2>Part A Summary</h2>
+<p>The two rectification examples show that the homographies and inverse warps can recover rectangular objects with the specified proportions. Bilinear interpolation reduces jagged edges but softens some texture and takes longer than nearest neighbor in these measurements.</p>
+<p>The three mosaics show a separate limitation: low error at the selected points does not guarantee alignment everywhere. Feather blending reduces abrupt seams, while the overlap close-ups still reveal ghosting. The Gateway reference comparison and the Iceland shared projection also show how the choice of output coordinates affects stretching.</p>
+<p>The extensions separate two improvements: two-band blending retains sharper local detail, while cylindrical projection and pitch adjustment reduce the stretched, tilted appearance of the campus mosaics.</p></section>
+<section class="part" id="part-b" data-part="b"><h2>Part B: Feature Matching for Autostitching</h2><p>I automate correspondence selection for the same Gateway, Opposite Gateway, and Iceland River pairs. The pipeline is Harris detection, adaptive non-maximal suppression, normalized patch descriptors, ratio-test matching, and four-point RANSAC. The source photographs and 1400-pixel working resolution are the same as in <a href="#a1">Part A</a>.</p><p>I follow the simplified pipeline in <a href="https://www.microsoft.com/en-us/research/wp-content/uploads/2005/06/cvpr05.pdf">Brown, Szeliski, and Winder: Multi-Image Matching using Multi-Scale Oriented Patches</a>. Detection is single-scale and descriptors are axis-aligned. I do not implement the optional multiscale, rotation-invariant, or panorama-recognition extensions in Part B.</p></section><section class="part" id="b1" data-part="b"><h2>B.1: Harris Corners and ANMS</h2><h3 id="b1-harris">Harris Corner Detection</h3><p>I convert the images to grayscale and use scikit-image’s Harris detector with $k=0.05$ and Gaussian scale $\sigma=1$. I retain positive local maxima above 1% of the maximum response, with a 20-pixel border excluded for descriptor extraction. Points are stored as $(x,y)$ coordinates, without subpixel refinement.</p><table><caption>Harris candidates and retained ANMS points</caption><thead><tr><th>Pair</th><th>Image 1 candidates</th><th>Image 2 candidates</th><th>ANMS per image</th></tr></thead><tbody><tr><td>Gateway</td><td>1,546</td><td>1,225</td><td>500</td></tr><tr><td>Opposite Gateway</td><td>4,189</td><td>3,495</td><td>500</td></tr><tr><td>Iceland River</td><td>4,068</td><td>2,971</td><td>500</td></tr></tbody></table><figure><a href="media/b1_gateway_harris_corners.png"><img loading="lazy" decoding="async" src="media/b1_gateway_harris_corners.png" width="2117" height="643" alt="Gateway: Harris candidates overlaid on both images."></a><figcaption>Gateway: Harris candidates overlaid on both images.</figcaption></figure><figure><a href="media/b1_opposite_gateway_harris_corners.png"><img loading="lazy" decoding="async" src="media/b1_opposite_gateway_harris_corners.png" width="2117" height="643" alt="Opposite Gateway: Harris candidates overlaid on both images."></a><figcaption>Opposite Gateway: Harris candidates overlaid on both images.</figcaption></figure><figure><a href="media/b1_iceland_river_harris_corners.png"><img loading="lazy" decoding="async" src="media/b1_iceland_river_harris_corners.png" width="2117" height="643" alt="Iceland River: Harris candidates overlaid on both images."></a><figcaption>Iceland River: Harris candidates overlaid on both images.</figcaption></figure><h3 id="b1-anms">Adaptive Non-Maximal Suppression</h3><p>I implement ANMS by measuring each candidate’s distance to its nearest sufficiently stronger corner, using robustness factor $c=0.9$. I retain the 500 largest suppression radii. If no sufficiently stronger point exists, its radius is infinite. Ties retain their original order.</p><div class="formula-block">$$r_i=\min_{j:\,f_i&lt;0.9f_j}\|p_i-p_j\|_2.$$</div><p>The comparisons below use equal-sized selections: the 500 strongest Harris responses and the 500 ANMS points. ANMS spreads points across the facade, buildings, and riverbank instead of concentrating them in the strongest textured regions. Empty sky still contributes few usable points. A suppression radius is a distance to a stronger candidate, not a guaranteed minimum spacing between every retained pair.</p><figure><a href="media/b1_gateway_anms_comparison.png"><img loading="lazy" decoding="async" src="media/b1_gateway_anms_comparison.png" width="2117" height="1337" alt="Gateway: strongest 500 corners versus ANMS 500, shown for both source images."></a><figcaption>Gateway: strongest 500 corners versus ANMS 500, shown for both source images.</figcaption></figure><figure><a href="media/b1_opposite_gateway_anms_comparison.png"><img loading="lazy" decoding="async" src="media/b1_opposite_gateway_anms_comparison.png" width="2117" height="1337" alt="Opposite Gateway: strongest 500 corners versus ANMS 500, shown for both source images."></a><figcaption>Opposite Gateway: strongest 500 corners versus ANMS 500, shown for both source images.</figcaption></figure><figure><a href="media/b1_iceland_river_anms_comparison.png"><img loading="lazy" decoding="async" src="media/b1_iceland_river_anms_comparison.png" width="2117" height="1337" alt="Iceland River: strongest 500 corners versus ANMS 500, shown for both source images."></a><figcaption>Iceland River: strongest 500 corners versus ANMS 500, shown for both source images.</figcaption></figure></section><section class="part" id="b2" data-part="b"><h2>B.2: Feature Descriptor Extraction</h2><p>I blur each grayscale image with a Gaussian of standard deviation 2 pixels. Around each selected point, I take a 40 × 40 window and sample every fifth pixel, starting at offset 2, to form an 8 × 8 patch. I subtract its mean and divide by its standard deviation, then flatten the result into a 64-value descriptor.</p><div class="formula-block">$$d=\frac{p-\mu_p}{\sigma_p}.$$</div><p>I skip out-of-bounds windows and patches with standard deviation below $10^{-6}$. All six images retain 500 descriptors, with none skipped. Numerical checks confirm finite values, means near zero, and standard deviations near one. Normalization reduces sensitivity to brightness offsets and positive contrast changes, but does not provide rotation or perspective invariance.</p><figure><a href="media/b2_gateway_descriptor_examples.png"><img loading="lazy" decoding="async" src="media/b2_gateway_descriptor_examples.png" width="2113" height="767" alt="Gateway: six original 40 × 40 windows above their normalized 8 × 8 descriptors. Display values are limited to [-3, 3], while matching uses the unclipped descriptors."></a><figcaption>Gateway: six original 40 × 40 windows above their normalized 8 × 8 descriptors. Display values are limited to [-3, 3], while matching uses the unclipped descriptors.</figcaption></figure><figure><a href="media/b2_opposite_gateway_descriptor_examples.png"><img loading="lazy" decoding="async" src="media/b2_opposite_gateway_descriptor_examples.png" width="2113" height="767" alt="Opposite Gateway: six original 40 × 40 windows above their normalized 8 × 8 descriptors. Display values are limited to [-3, 3], while matching uses the unclipped descriptors."></a><figcaption>Opposite Gateway: six original 40 × 40 windows above their normalized 8 × 8 descriptors. Display values are limited to [-3, 3], while matching uses the unclipped descriptors.</figcaption></figure><figure><a href="media/b2_iceland_river_descriptor_examples.png"><img loading="lazy" decoding="async" src="media/b2_iceland_river_descriptor_examples.png" width="2113" height="767" alt="Iceland River: six original 40 × 40 windows above their normalized 8 × 8 descriptors. Display values are limited to [-3, 3], while matching uses the unclipped descriptors."></a><figcaption>Iceland River: six original 40 × 40 windows above their normalized 8 × 8 descriptors. Display values are limited to [-3, 3], while matching uses the unclipped descriptors.</figcaption></figure><p>The descriptors preserve broad edges and light-dark structure while smoothing fine texture. Repeated windows and similar natural patterns can still have similar descriptors, so local appearance alone cannot establish a correct correspondence.</p></section><section class="part" id="b3" data-part="b"><h2>B.3: Feature Matching</h2><p>For every descriptor in image 1, I compute the sum of squared differences (SSD) against all descriptors in image 2. I find the nearest and second-nearest neighbors and accept the best match only when their SSD ratio is below 0.65. This compares how distinctive the best match is, following the ratio-based separation illustrated in Figure 6b of the paper.</p><div class="formula-block">$$\frac{\mathrm{SSD}_{1\mathrm{NN}}}{\mathrm{SSD}_{2\mathrm{NN}}}&lt;0.65.$$</div><p>The threshold applies to squared distances, not unsquared Euclidean distances. If the second-best error is zero, I reject the ambiguous match. Matching is one-way, so multiple source points can select the same destination. The same threshold is used for all three pairs.</p><figure><a href="media/b3_gateway_matches.png"><img loading="lazy" decoding="async" src="media/b3_gateway_matches.png" width="2385" height="724" alt="Gateway: all matches retained by the ratio test before RANSAC."></a><figcaption>Gateway: all matches retained by the ratio test before RANSAC.</figcaption></figure><figure><a href="media/b3_opposite_gateway_matches.png"><img loading="lazy" decoding="async" src="media/b3_opposite_gateway_matches.png" width="2385" height="724" alt="Opposite Gateway: all matches retained by the ratio test before RANSAC."></a><figcaption>Opposite Gateway: all matches retained by the ratio test before RANSAC.</figcaption></figure><figure><a href="media/b3_iceland_river_matches.png"><img loading="lazy" decoding="async" src="media/b3_iceland_river_matches.png" width="2385" height="724" alt="Iceland River: all matches retained by the ratio test before RANSAC."></a><figcaption>Iceland River: all matches retained by the ratio test before RANSAC.</figcaption></figure><p>The ratio test retains 52 Gateway matches, 129 Opposite Gateway matches, and 76 Iceland River matches. Many follow the overlap, but some connect unrelated windows, vegetation, or river features. I use geometric consistency to reject these remaining outliers.</p></section><section class="part" id="b4" data-part="b"><h2>B.4: RANSAC and Automatic Mosaics</h2><h3 id="b4-ransac">Four-Point RANSAC</h3><p>I implement RANSAC from scratch. Each of 5,000 trials samples four matches without replacement and estimates image 1’s homography into image 2 using the Part A solver. Degenerate samples are skipped. A match is an inlier when its forward reprojection error is below 3 pixels at the working resolution.</p><div class="formula-block">$$e_i=\|\pi(H[x_i,y_i,1]^T)-[u_i,v_i]^T\|_2&lt;3.$$</div><p>I retain the model with the most inliers, breaking ties using the smaller mean inlier error. I refit it using its consensus set and recompute the inlier mask and errors. A fixed random seed of 180 makes the sampling reproducible.</p><table><caption>Final automatic inlier statistics</caption><thead><tr><th>Pair</th><th>Inliers / matches</th><th>Inlier fraction</th><th>RMS error</th><th>Maximum error</th></tr></thead><tbody><tr><td>Gateway</td><td>29 / 52</td><td>55.8%</td><td>0.813 px</td><td>1.789 px</td></tr><tr><td>Opposite Gateway</td><td>116 / 129</td><td>89.9%</td><td>1.193 px</td><td>2.531 px</td></tr><tr><td>Iceland River</td><td>57 / 76</td><td>75.0%</td><td>0.838 px</td><td>2.739 px</td></tr></tbody></table><figure><a href="media/b4_gateway_ransac_matches.png"><img loading="lazy" decoding="async" src="media/b4_gateway_ransac_matches.png" width="2417" height="1506" alt="Gateway: final inliers above the rejected matches."></a><figcaption>Gateway: final inliers above the rejected matches.</figcaption></figure><figure><a href="media/b4_opposite_gateway_ransac_matches.png"><img loading="lazy" decoding="async" src="media/b4_opposite_gateway_ransac_matches.png" width="2417" height="1506" alt="Opposite Gateway: final inliers above the rejected matches."></a><figcaption>Opposite Gateway: final inliers above the rejected matches.</figcaption></figure><figure><a href="media/b4_iceland_river_ransac_matches.png"><img loading="lazy" decoding="async" src="media/b4_iceland_river_ransac_matches.png" width="2417" height="1506" alt="Iceland River: final inliers above the rejected matches."></a><figcaption>Iceland River: final inliers above the rejected matches.</figcaption></figure><p>Gateway rejects the largest fraction of matches because repeated windows are ambiguous. Its inliers concentrate near the central facade and entrance. Opposite Gateway has more broadly distributed support, while Iceland retains many matches on the far bank. These errors describe the fitted automatic matches, not independent ground truth. They cannot be directly ranked against Part A’s errors because the point sets differ.</p><h3 id="b4-homographies">Recovered Homographies</h3><h4>Gateway</h4><div class="formula-block">$$H=\begin{bmatrix}2.788855&amp;-0.5481252&amp;-1877.255\\0.9040128&amp;2.179427&amp;-797.272\\0.001389977&amp;-0.0002972167&amp;1\end{bmatrix}.$$</div><h4>Opposite Gateway</h4><div class="formula-block">$$H=\begin{bmatrix}2.464725&amp;-0.3052705&amp;-1395.291\\0.6467602&amp;1.926132&amp;-557.2633\\0.001095344&amp;-0.0001513394&amp;1\end{bmatrix}.$$</div><h4>Iceland River</h4><div class="formula-block">$$H=\begin{bmatrix}-0.01078852&amp;0.0566214&amp;650.7127\\-0.2387357&amp;0.7389211&amp;53.0285\\-0.0007533719&amp;9.718346e-05&amp;1\end{bmatrix}.$$</div><h3 id="b4-manual-auto">Manual and Automatic Stitching</h3><p>I reuse Part A’s bilinear inverse warp and distance-based feather blending. The campus pairs use image 2 as reference. Iceland uses $G_1=(I+H)/2$ and $G_2=G_1H^{-1}$, with the automatic $H$, to keep both full-image warps finite. I verify the transforms and boundary denominators before allocating their canvases.</p><p>These comparisons use the original feather-blended manual results, rather than the optional two-band or cylindrical variants, so the blending method and projection construction match. Different estimated homographies can still produce different canvas shapes and sizes.</p><h3>Gateway</h3><figure><a href="media/b4_gateway_manual_vs_automatic.png"><img loading="lazy" decoding="async" src="media/b4_gateway_manual_vs_automatic.png" width="2417" height="836" alt="Gateway: manual correspondences on the left and automatic correspondences on the right."></a><figcaption>Gateway: manual correspondences on the left and automatic correspondences on the right.</figcaption></figure><p>The facade and entrance form a continuous scene, but the roofline and extent of the left side differ from the manual result. Both views stretch the left side in image 2’s reference frame. The automatic canvas is 4414 × 1998 pixels.</p><h3>Opposite Gateway</h3><figure><a href="media/b4_opposite_gateway_manual_vs_automatic.png"><img loading="lazy" decoding="async" src="media/b4_opposite_gateway_manual_vs_automatic.png" width="2417" height="866" alt="Opposite Gateway: manual correspondences on the left and automatic correspondences on the right."></a><figcaption>Opposite Gateway: manual correspondences on the left and automatic correspondences on the right.</figcaption></figure><p>The buildings, parked cars, and lawn have similar overall alignment in the two results. The automatic view extends somewhat farther on the left. Fine foliage and nearby objects can still show local differences. The automatic canvas is 3257 × 1648 pixels.</p><h3>Iceland River</h3><figure><a href="media/b4_iceland_river_manual_vs_automatic.png"><img loading="lazy" decoding="async" src="media/b4_iceland_river_manual_vs_automatic.png" width="2417" height="894" alt="Iceland River: manual correspondences on the left and automatic correspondences on the right."></a><figcaption>Iceland River: manual correspondences on the left and automatic correspondences on the right.</figcaption></figure><p>The far bank and waterfall ledges form a panorama similar to the manual result. The left side remains stretched and soft, and moving water can disagree between images. The automatic canvas is 3614 × 1978 pixels.</p><p>The automatic pipeline produces all three mosaics without manually choosing new correspondences. ANMS improves spatial coverage, the ratio test removes ambiguous local matches, and RANSAC checks geometric agreement. The results remain limited by source detail, moving objects, and the chosen output projection.</p></section>
+<footer class="project-footer">CS180 &middot; Project 4</footer>
+</main>
+<script>
+(function () {
+    var page = document.querySelector(".project-page");
+    var bar = document.querySelector(".part-filter");
+    if (!page || !bar) { return; }
+
+    var buttons = bar.querySelectorAll("[data-set-view]");
+    var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var timer;
+
+    function setView(view, animate) {
+        page.setAttribute("data-view", view);
+        buttons.forEach(function (btn) {
+            btn.setAttribute("aria-pressed", String(btn.getAttribute("data-set-view") === view));
+        });
+        if (animate && !reduceMotion) {
+            page.classList.remove("is-switching");
+            void page.offsetWidth;
+            page.classList.add("is-switching");
+            clearTimeout(timer);
+            timer = setTimeout(function () { page.classList.remove("is-switching"); }, 260);
+        }
+    }
+
+    function revealHashTarget() {
+        var id = decodeURIComponent(location.hash.slice(1));
+        var target = id && document.getElementById(id);
+        if (!target) { return; }
+        var group = target.closest("[data-part]");
+        var part = group && group.getAttribute("data-part");
+        var view = page.getAttribute("data-view") || "both";
+        if (part && view !== "both" && view !== part) {
+            setView(part, false);
+            target.scrollIntoView();
+        }
+    }
+
+    buttons.forEach(function (btn) {
+        btn.addEventListener("click", function () {
+            setView(btn.getAttribute("data-set-view"), true);
+            var rect = bar.getBoundingClientRect();
+            if (rect.top < 0 || rect.bottom > window.innerHeight) {
+                bar.scrollIntoView({ block: "start" });
+            }
+        });
+    });
+
+    window.addEventListener("hashchange", revealHashTarget);
+    bar.hidden = false;
+    revealHashTarget();
+})();
+</script>
+</body></html>

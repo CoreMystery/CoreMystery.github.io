@@ -1,4 +1,4 @@
-/* Shared presentation for Projects 0-3. Loaded after each page's inline <style>. */
+/* Shared presentation for Projects 0-4. Loaded after each page's inline <style>. */
 
 /* ---------- Page header ---------- */
 .project-page {
@@ -222,4 +222,18 @@ figcaption {
     .back-link::after {
         display: none !important;
     }
+}
+
+/* Matching report footers for Projects 1-4. */
+.project-footer {
+    margin: 40px auto 0;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+@media print {
+    .project-footer { margin-top: 20px; break-inside: avoid; }
 }
